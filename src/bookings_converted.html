@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAS Pro - My Bookings</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts - Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .bookings-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .tab-btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 1px solid #eee;
+            background-color: white;
+            color: #666;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background-color: #FF6B00;
+            color: white;
+            border-color: #FF6B00;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+        }
+        .booking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .status-pending {
+            background-color: #fff4ed;
+            color: #FF6B00;
+        }
+        .status-completed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .booking-info {
+            display: flex;
+            align-items: center;
+        }
+        .booking-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f1f1;
+        }
+        .btn-action {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        footer {
+            background-color: #1a1a1a;
+            color: #ccc;
+            padding: 60px 0 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index_converted.html">
+                <img src="../public/attachment1 1.jpg" alt="TAS Pro Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index_converted.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="services_converted.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="amc_services_converted.html">AMC Service</a></li>
+                    <li class="nav-item"><a class="nav-link" href="rate_card_converted.html">Rate Card</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="cart_converted.html" class="btn btn-light rounded-circle me-2 position-relative">
+                        <i class="bi bi-cart"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </a>
+                    <a href="account_converted.html" class="btn btn-light rounded-circle">
+                        <i class="bi bi-person"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bookings Content -->
+    <div class="container bookings-container">
+        <h2 class="fw-bold mb-4">My Bookings</h2>
+        
+        <!-- Tabs -->
+        <div class="d-flex overflow-auto pb-3 mb-4" style="white-space: nowrap;">
+            <button class="tab-btn active">Pending</button>
+            <button class="tab-btn">Rejected</button>
+            <button class="tab-btn">Completed</button>
+        </div>
+
+        <div class="d-flex gap-2 mb-4">
+            <button class="btn btn-sm btn-dark rounded-pill px-3">Home Services</button>
+            <button class="btn btn-sm btn-outline-dark rounded-pill px-3">AMC Services</button>
+        </div>
+
+        <!-- Booking List -->
+        <div id="bookingList">
+            <!-- Booking Card 1 -->
+            <div class="booking-card">
+                <div class="booking-header">
+                    <div>
+                        <span class="text-muted small">Booking ID:</span>
+                        <span class="fw-bold small">BK-74920</span>
+                    </div>
+                    <span class="status-badge status-pending">PENDING</span>
+                </div>
+                
+                <div class="booking-info">
+                    <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=2069&auto=format&fit=crop" alt="Service" class="booking-img">
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1">Split AC Service</h6>
+                        <p class="text-muted small mb-2"><i class="bi bi-calendar3 me-2"></i> Sat, 14 Mar 2026 • 09:00 AM</p>
+                        <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-2"></i> 123, Main Street, Raipur</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="fw-bold mb-0 text-orange">₹2,999</p>
+                        <span class="badge bg-light text-dark border fw-normal">Cash on Delivery</span>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    <button class="btn btn-outline-danger btn-action"><i class="bi bi-x-circle me-2"></i> Cancel</button>
+                    <button class="btn btn-outline-secondary btn-action"><i class="bi bi-calendar-event me-2"></i> Reschedule</button>
+                    <button class="btn btn-dark btn-action ms-auto">View Details</button>
+                </div>
+            </div>
+
+            <!-- Booking Card 2 -->
+            <div class="booking-card">
+                <div class="booking-header">
+                    <div>
+                        <span class="text-muted small">Booking ID:</span>
+                        <span class="fw-bold small">BK-74915</span>
+                    </div>
+                    <span class="status-badge status-completed">COMPLETED</span>
+                </div>
+                
+                <div class="booking-info">
+                    <img src="https://images.unsplash.com/photo-1599423300746-b62533397364?q=80&w=2070&auto=format&fit=crop" alt="Service" class="booking-img">
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1">Fridge Repair</h6>
+                        <p class="text-muted small mb-2"><i class="bi bi-calendar3 me-2"></i> Tue, 10 Mar 2026 • 02:00 PM</p>
+                        <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-2"></i> 123, Main Street, Raipur</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="fw-bold mb-0 text-orange">₹1,499</p>
+                        <span class="badge bg-success-subtle text-success border-success-subtle fw-normal">Paid Online</span>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    <button class="btn btn-outline-primary btn-action"><i class="bi bi-star me-2"></i> Rate Service</button>
+                    <button class="btn btn-outline-secondary btn-action"><i class="bi bi-file-earmark-text me-2"></i> Download Invoice</button>
+                    <button class="btn btn-dark btn-action ms-auto">View Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center text-md-start">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h3>TAS Pro</h3>
+                    <p class="small">Expert services at your doorstep. Professional repair and maintenance services for your home and appliances.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-end">
+                        <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

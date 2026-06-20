@@ -1,0 +1,111 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 97%;
+    --foreground: 0 0% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+
+    --primary: 18 100% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 18 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 18 100% 60%;
+
+    --radius: 0.75rem;
+
+    --orange: 18 100% 60%;
+    --orange-dark: 18 100% 50%;
+    --orange-light: 18 100% 95%;
+    --gray-100: 0 0% 97%;
+    --gray-200: 0 0% 93%;
+    --gray-300: 0 0% 88%;
+    --gray-400: 0 0% 70%;
+    --gray-500: 0 0% 55%;
+    --gray-600: 0 0% 40%;
+    --gray-700: 0 0% 25%;
+    --gray-800: 0 0% 15%;
+    --gray-900: 0 0% 10%;
+
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: "Inter", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Inter", sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-orange-dark transition-colors duration-200 rounded-lg font-medium;
+  }
+
+  .btn-outline-primary {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors duration-200 rounded-lg font-medium;
+  }
+
+  .card-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-shadow-hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .section-padding {
+    @apply py-10 px-4 md:px-8 lg:px-16;
+  }
+
+  /* Hide scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4;
+  }
+}

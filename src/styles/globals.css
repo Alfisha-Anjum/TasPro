@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations */
+@keyframes scale-95 {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.active-scale {
+  animation: scale-95 0.15s ease-in-out;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar for horizontal scrolling */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1025px) {
+  .grid-responsive {
+    grid-template-columns: 2fr 1fr;
+  }
+}

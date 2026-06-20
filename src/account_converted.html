@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAS Pro - My Account</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts - Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .account-container {
+            margin-top: 40px;
+            margin-bottom: 60px;
+        }
+        .sidebar {
+            background-color: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #555;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .sidebar-item:hover {
+            background-color: #fff4ed;
+            color: #FF6B00;
+        }
+        .sidebar-item.active {
+            background-color: #FF6B00;
+            color: white;
+        }
+        .sidebar-item i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        .account-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            min-height: 500px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #fff4ed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #FF6B00;
+            margin-right: 20px;
+            position: relative;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            color: #666;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+        }
+        .form-control:focus {
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.1);
+        }
+        .btn-save {
+            background-color: #FF6B00;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            border: none;
+        }
+        .btn-save:hover {
+            background-color: #e66000;
+            color: white;
+        }
+        .address-card {
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .address-badge {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .wallet-balance {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8E3C 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        footer {
+            background-color: #1a1a1a;
+            color: #ccc;
+            padding: 60px 0 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index_converted.html">
+                <img src="../public/attachment1 1.jpg" alt="TAS Pro Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index_converted.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="ac_repair_converted.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">AMC Service</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Rate Card</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="#" class="btn btn-light rounded-circle me-2 position-relative">
+                        <i class="bi bi-cart"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </a>
+                    <a href="account_converted.html" class="btn btn-light rounded-circle active">
+                        <i class="bi bi-person"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Account Page Content -->
+    <div class="container account-container">
+        <div class="row g-4">
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <div class="d-flex align-items-center mb-4 p-2">
+                        <div class="profile-avatar mb-0" style="width: 60px; height: 60px; font-size: 24px;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">John Doe</h6>
+                            <p class="text-muted small mb-0">+91 98765 43210</p>
+                        </div>
+                    </div>
+                    
+                    <div class="nav flex-column">
+                        <a href="#profile" class="sidebar-item active" data-bs-toggle="pill">
+                            <i class="bi bi-person"></i> Edit Profile
+                        </a>
+                        <a href="#addresses" class="sidebar-item" data-bs-toggle="pill">
+                            <i class="bi bi-geo-alt"></i> My Addresses
+                        </a>
+                        <a href="#wallet" class="sidebar-item" data-bs-toggle="pill">
+                            <i class="bi bi-wallet2"></i> My Wallet
+                        </a>
+                        <a href="#bank" class="sidebar-item" data-bs-toggle="pill">
+                            <i class="bi bi-bank"></i> Bank Accounts
+                        </a>
+                        <a href="#refer" class="sidebar-item" data-bs-toggle="pill">
+                            <i class="bi bi-gift"></i> Refer & Earn
+                        </a>
+                        <a href="#language" class="sidebar-item" data-bs-toggle="pill">
+                            <i class="bi bi-translate"></i> Language
+                        </a>
+                        <hr>
+                        <a href="#" class="sidebar-item text-danger">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="tab-content">
+                    <!-- Profile Section -->
+                    <div class="tab-pane fade show active" id="profile">
+                        <div class="account-content">
+                            <h4 class="fw-bold mb-4">Edit Profile</h4>
+                            
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <i class="bi bi-person"></i>
+                                    <div class="avatar-edit"><i class="bi bi-camera"></i></div>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Profile Photo</h6>
+                                    <p class="text-muted small mb-0">Update your profile picture</p>
+                                </div>
+                            </div>
+
+                            <form>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" placeholder="Enter first name" value="John">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" placeholder="Enter last name" value="Doe">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender</label>
+                                        <select class="form-select form-control">
+                                            <option selected>Male</option>
+                                            <option>Female</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" placeholder="Enter phone number" value="9876543210" disabled>
+                                    </div>
+                                    <div class="col-12 mt-4">
+                                        <button type="submit" class="btn btn-save">Save Changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Addresses Section -->
+                    <div class="tab-pane fade" id="addresses">
+                        <div class="account-content">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="fw-bold mb-0">My Addresses</h4>
+                                <button class="btn btn-outline-primary btn-sm rounded-3 px-3"><i class="bi bi-plus"></i> Add New</button>
+                            </div>
+
+                            <div class="address-card">
+                                <span class="address-badge">DEFAULT</span>
+                                <h6 class="fw-bold mb-2">John Doe</h6>
+                                <p class="text-muted small mb-3">123, Main Street, Near Metro Station, New Delhi, Delhi - 110001</p>
+                                <p class="text-muted small mb-4"><i class="bi bi-telephone me-2"></i> +91 98765 43210</p>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-light border px-3">Edit</button>
+                                    <button class="btn btn-sm btn-light border px-3 text-danger">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wallet Section -->
+                    <div class="tab-pane fade" id="wallet">
+                        <div class="account-content">
+                            <h4 class="fw-bold mb-4">My Wallet</h4>
+                            
+                            <div class="wallet-balance">
+                                <p class="small mb-1 opacity-75">Available Balance</p>
+                                <h2 class="fw-bold mb-0">₹1,250.00</h2>
+                            </div>
+
+                            <h6 class="fw-bold mb-3">Recent Transactions</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Referral Bonus</h6>
+                                        <p class="text-muted small mb-0">15 Jan 2024</p>
+                                    </div>
+                                    <span class="text-success fw-bold">+₹500.00</span>
+                                </div>
+                                <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Service Payment</h6>
+                                        <p class="text-muted small mb-0">10 Jan 2024</p>
+                                    </div>
+                                    <span class="text-danger fw-bold">-₹200.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row g-4 text-center text-md-start">
+                <div class="col-md-4">
+                    <h3 class="mb-3">TAS Pro</h3>
+                    <p class="small">Expert services at your doorstep. We provide professional repair and maintenance services for your home and appliances.</p>
+                </div>
+                <div class="col-md-4">
+                    <h3>Quick Links</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-muted">About Us</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Terms of Service</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h3>Connect With Us</h3>
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-start">
+                        <a href="#" class="text-white fs-5"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

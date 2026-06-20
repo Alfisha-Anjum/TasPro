@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAS Pro - Shopping Cart</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts - Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .cart-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .cart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid #eee;
+        }
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .item-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .qty-btn:hover {
+            border-color: #FF6B00;
+            color: #FF6B00;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            position: sticky;
+            top: 100px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .summary-total {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .btn-checkout {
+            background-color: #FF6B00;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-top: 25px;
+            transition: all 0.2s;
+        }
+        .btn-checkout:hover {
+            background-color: #e66000;
+            color: white;
+        }
+        .frequently-added {
+            background: #fff4ed;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .freq-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .freq-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-right: 12px;
+        }
+        footer {
+            background-color: #1a1a1a;
+            color: #ccc;
+            padding: 60px 0 30px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index_converted.html">
+                <img src="../public/attachment1 1.jpg" alt="TAS Pro Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index_converted.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="services_converted.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="amc_services_converted.html">AMC Service</a></li>
+                    <li class="nav-item"><a class="nav-link" href="rate_card_converted.html">Rate Card</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="cart_converted.html" class="btn btn-light rounded-circle active me-2 position-relative">
+                        <i class="bi bi-cart"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">1</span>
+                    </a>
+                    <a href="account_converted.html" class="btn btn-light rounded-circle">
+                        <i class="bi bi-person"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Content -->
+    <div class="container cart-container">
+        <h2 class="fw-bold mb-5">Shopping Cart</h2>
+        
+        <div class="row g-4">
+            <!-- Left Side: Cart Items -->
+            <div class="col-lg-8">
+                <!-- Customer Info -->
+                <div class="cart-card">
+                    <h5 class="fw-bold mb-4">Customer Details</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Full Name</label>
+                            <input type="text" class="form-control" value="John Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Phone Number</label>
+                            <input type="tel" class="form-control" value="9876543210">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Items -->
+                <div class="cart-card">
+                    <h5 class="fw-bold mb-4">Order Details</h5>
+                    <div class="item-row">
+                        <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=2069&auto=format&fit=crop" alt="AC Service" class="item-img">
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1">Split AC Service</h6>
+                            <p class="text-muted small mb-0">Expert cleaning and maintenance</p>
+                        </div>
+                        <div class="text-end me-4">
+                            <p class="fw-bold mb-0">₹2,999</p>
+                            <p class="text-muted small text-decoration-line-through mb-0">₹3,999</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="qty-btn">-</button>
+                            <span class="fw-bold">1</span>
+                            <button class="qty-btn">+</button>
+                        </div>
+                        <button class="btn text-danger ms-3"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+
+                <!-- Frequently Added -->
+                <div class="frequently-added">
+                    <h6 class="fw-bold mb-3">Frequently added with this</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="freq-item">
+                                <img src="../public/hero1.png" alt="Warranty" class="freq-img">
+                                <div class="flex-grow-1">
+                                    <h6 class="small fw-bold mb-0">Extended Warranty</h6>
+                                    <p class="text-orange small fw-bold mb-0">₹1,999</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">Add</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="freq-item">
+                                <img src="../public/hero2.png" alt="Service" class="freq-img">
+                                <div class="flex-grow-1">
+                                    <h6 class="small fw-bold mb-0">Same-day Service</h6>
+                                    <p class="text-orange small fw-bold mb-0">₹499</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Summary -->
+            <div class="col-lg-4">
+                <div class="summary-card">
+                    <h5 class="fw-bold mb-4">Payment Summary</h5>
+                    <div class="summary-row">
+                        <span class="text-muted">Item Total (MRP)</span>
+                        <span>₹3,999</span>
+                    </div>
+                    <div class="summary-row text-success">
+                        <span>Item Discount</span>
+                        <span>-₹1,000</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="text-muted">Convenience Fee</span>
+                        <span class="text-success">FREE</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>Total Amount</span>
+                        <span class="text-orange">₹2,999</span>
+                    </div>
+                    <p class="text-success small mt-3 mb-0"><i class="bi bi-check-circle-fill me-1"></i> You saved ₹1,000 on this order</p>
+                    
+                    <button class="btn-checkout" onclick="window.location.href='booking_flow_converted.html'">Proceed to Checkout</button>
+                    
+                    <div class="mt-4 p-3 bg-light rounded-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-shield-check text-success"></i>
+                            <span class="small fw-bold">Safe & Secure Payments</span>
+                        </div>
+                        <p class="text-muted x-small mb-0">100% Payment Protection, Easy Returns</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center text-md-start">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h3>TAS Pro</h3>
+                    <p class="small">Expert services at your doorstep. Professional repair and maintenance services for your home and appliances.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-end">
+                        <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

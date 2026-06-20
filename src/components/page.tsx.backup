@@ -1,0 +1,471 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { 
+  Star, Shield, CheckCircle, ChevronRight, ChevronDown, 
+  ShoppingCart, Tag, Info
+} from "lucide-react";
+import Header from "./Header";
+import Footer from "./Footer";
+import LayoutContainer from "./LayoutContainer";
+import ServicesSection from "./ServicesSection";
+
+// --- Types & Mock Data ---
+
+const services = [
+  {
+    id: 1,
+    title: "Power Jet Deep Cleaning",
+    rating: 4.8,
+    reviews: "6.5k",
+    price: 599,
+    originalPrice: 899,
+    duration: "45 mins",
+    description: "Deep cleaning of indoor & outdoor unit with power jet",
+    image: "/hero1.png" 
+  },
+  {
+    id: 2,
+    title: "Anti-Rust Deep Cleaning",
+    rating: 4.9,
+    reviews: "2.1k",
+    price: 899,
+    originalPrice: 1299,
+    duration: "60 mins",
+    description: "Prevents rust & corrosion in coastal areas",
+    image: "/hero1.png"
+  },
+  {
+    id: 3,
+    title: "Foam Jet Technology",
+    rating: 4.7,
+    reviews: "1.2k",
+    price: 799,
+    originalPrice: 1099,
+    duration: "50 mins",
+    description: "Advanced foam cleaning for better cooling",
+    image: "/hero1.png"
+  }
+];
+
+const reviews = [
+  {
+    id: 1,
+    name: "Rahul Sharma",
+    rating: 5,
+    text: "Excellent service! The technician was very professional and arrived on time.",
+    image: "https://github.com/shadcn.png"
+  },
+  {
+    id: 2,
+    name: "Priya Singh",
+    rating: 4.5,
+    text: "Good job with the AC cleaning. Cooling has improved significantly.",
+    image: "https://github.com/shadcn.png"
+  }
+];
+
+const brands = ["Voltas", "Daikin", "Samsung", "Blue Star", "Hitachi", "Mitsubishi"];
+
+const faqs = [
+  {
+    question: "What is included in AC Service?",
+    answer: "Our AC service includes deep cleaning of the indoor and outdoor units, checking gas pressure, and cleaning filters."
+  },
+  {
+    question: "Do you provide warranty?",
+    answer: "Yes, we provide a 30-day warranty on all our services."
+  },
+  {
+    question: "Are there any hidden charges?",
+    answer: "No, we have a standard rate card. Any additional parts required will be charged as per the rate card."
+  }
+];
+
+const rateCard = [
+  { part: "Non-Inverter PCB Repaired", charge: "₹1500", labour: "₹200" },
+  { part: "Inverter PCB Repaired", charge: "₹4000", labour: "₹200" },
+  { part: "Replace LVT", charge: "₹900", labour: "₹200" },
+  { part: "Capacitor 2-5 mfd", charge: "₹250", labour: "₹250" },
+  { part: "Capacitor 35-50 mfd", charge: "₹250", labour: "₹250" },
+  { part: "Capacitor 50-60 mfd", charge: "₹250", labour: "₹250" },
+  { part: "Replace Sensor", charge: "₹250", labour: "₹250" },
+];
+
+export default function AMCPage() {
+  const [activeTab, setActiveTab] = useState("Split AC");
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [cartCount, setCartCount] = useState(0);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans">
+      <Header />
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+          animation: scroll 30s linear infinite;
+        }
+        .animate-scroll:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      <main className="pb-20">
+        {/* SECTION 1: HERO SERVICE HEADER */}
+        <section className="bg-white pt-8 pb-8">
+          <LayoutContainer>
+            <div className="flex flex-col lg:flex-row gap-8 items-start">
+              {/* Left Side */}
+              <div className="flex-1">
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                  <span>Home</span>
+                  <ChevronRight className="w-4 h-4" />
+                  <span>AC Appliance Repair</span>
+                  <ChevronRight className="w-4 h-4" />
+                  <span className="text-orange-500 font-medium">AC Repair</span>
+                </div>
+
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                  Best Air Condition (AC) Repair Service in Raipur
+                </h1>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-1 bg-green-50 px-2 py-1 rounded-md border border-green-100">
+                    <Star className="w-4 h-4 text-green-600 fill-current" />
+                    <span className="font-bold text-green-700">4.8</span>
+                  </div>
+                  <span className="text-gray-500 text-sm">6.5k Reviews</span>
+                  <div className="h-4 w-px bg-gray-300"></div>
+                  <span className="text-gray-500 text-sm">15k+ Bookings</span>
+                </div>
+
+                <div className="inline-flex items-center gap-2 bg-black text-white px-3 py-1.5 rounded-full text-xs font-bold mb-6">
+                  <Shield className="w-3 h-3" />
+                  TASPro Cover
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-gray-700">30 days warranty</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-gray-700">Standard rate card no hidden charges</span>
+                  </div>
+                </div>
+              </div>
+
+               {/* Right Side - Image */}
+               <div className="w-full lg:w-[480px] h-[300px] relative rounded-2xl overflow-hidden shadow-lg lg:mt-10">
+                 <Image 
+                   src="/heroimage.jpg" 
+                   alt="AC Service" 
+                   fill 
+                   className="object-cover"
+                 />
+               </div>
+             </div>
+           </div>
+         </LayoutContainer>
+       </section>
+
+        {/* SECTION 2: CATEGORY TABS */}
+        <section className="sticky top-20 z-30 bg-white border-b border-gray-100 shadow-sm">
+          <LayoutContainer>
+            <div className="flex gap-4 py-4 overflow-x-auto no-scrollbar">
+              {["Split AC", "Window AC", "Cassette AC"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                    activeTab === tab
+                      ? "bg-orange-50 text-orange-600 border border-orange-200 shadow-sm"
+                      : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          </LayoutContainer>
+        </section>
+
+        {/* SECTION 3: SERVICE LIST + CART LAYOUT */}
+        <section className="py-8">
+          <LayoutContainer>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* LEFT SIDE - Service List */}
+            <div className="flex-1 space-y-6">
+              {services.map((service) => (
+                <div key={service.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <div className="flex gap-5">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{service.title}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-1 bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
+                          <Star className="w-3 h-3 text-green-600 fill-current" />
+                          <span className="text-xs font-bold text-green-700">{service.rating}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">({service.reviews})</span>
+                        <span className="text-xs text-gray-400">•</span>
+                        <span className="text-xs text-gray-500">{service.duration}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-lg font-bold text-gray-900">₹{service.price}</span>
+                        <span className="text-sm text-gray-400 line-through">₹{service.originalPrice}</span>
+                        <span className="text-xs font-bold text-green-600">
+                          {Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100)}% OFF
+                        </span>
+                      </div>
+                      
+                      <ul className="text-sm text-gray-600 space-y-1 mb-4 list-disc pl-4">
+                        <li>{service.description}</li>
+                      </ul>
+
+                      <button className="text-blue-600 text-sm font-medium hover:underline">
+                        More Details
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-28 h-28 relative rounded-xl overflow-hidden bg-gray-100">
+                        <Image 
+                          src={service.image} 
+                          alt={service.title} 
+                          fill 
+                          className="object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder-service.jpg"; }}
+                        />
+                        <button 
+                          onClick={() => setCartCount(prev => prev + 1)}
+                          className="absolute bottom-[-12px] left-1/2 -translate-x-1/2 bg-white text-orange-600 font-bold text-sm px-6 py-1.5 rounded-lg shadow-md border border-gray-100 hover:bg-orange-50 transition-colors uppercase"
+                        >
+                          ADD
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* RIGHT SIDE - Sticky Sidebar */}
+            <div className="lg:w-[380px] flex-shrink-0 space-y-6">
+              <div className="sticky top-36 space-y-6">
+                {/* Cart Card */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
+                  {cartCount === 0 ? (
+                    <>
+                      <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ShoppingCart className="w-8 h-8 text-gray-300" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Your Cart is empty</h3>
+                      <p className="text-sm text-gray-500 mb-4">Add services to proceed</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold text-gray-900">Cart ({cartCount})</h3>
+                        <span className="text-orange-600 font-bold">₹{services[0].price * cartCount}</span>
+                      </div>
+                      <button className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:shadow-orange-300 transition-all">
+                        Checkout
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Why TASPro */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                  <h3 className="font-bold text-gray-900 mb-4">Why TASPro?</h3>
+                  <ul className="space-y-4">
+                    {[
+                      "Trained & skilled technician",
+                      "100% satisfaction guarantee",
+                      "On time delivery",
+                      "Best price guarantee",
+                      "Hassle free work"
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-gray-700">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Coupons */}
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer hover:border-orange-200 transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+                      <Tag className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 text-sm">Coupons & Offers</h4>
+                      <p className="text-xs text-green-600 font-medium">Save upto 15% on every booking</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </LayoutContainer>
+        </section>
+
+        {/* SECTION 4: CUSTOMER REVIEWS */}
+        <section className="py-12 relative">
+          <div className="absolute inset-0 bg-gray-900">
+            <Image 
+              src="/heroimage.jpg" 
+              alt="Background" 
+              fill 
+              className="object-cover opacity-20"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60" />
+          </div>
+          
+          <LayoutContainer className="relative z-10">
+            <div className="flex justify-between items-end mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-white mb-2">Customer Reviews</h2>
+                <p className="text-gray-300">What our customers say about us</p>
+              </div>
+              <button className="text-orange-400 font-bold text-sm hover:text-orange-300 transition-colors">
+                View All Reviews {'>>>'}
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {reviews.map((review) => (
+                <div key={review.id} className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500">
+                      <Image src={review.image} alt={review.name} width={48} height={48} className="object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white">{review.name}</h4>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`w-3 h-3 ${i < Math.floor(review.rating) ? 'text-orange-400 fill-current' : 'text-gray-600'}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-200 text-sm leading-relaxed">"{review.text}"</p>
+                </div>
+              ))}
+            </div>
+          </LayoutContainer>
+        </section>
+
+        {/* SECTION 5: BRAND LOGOS */}
+        <section className="py-12 bg-gray-50">
+          <LayoutContainer>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Brands We Service</h2>
+            <div className="relative w-full overflow-hidden group">
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none" />
+              <div className="flex gap-8 animate-scroll w-max">
+                {[...brands, ...brands, ...brands, ...brands].map((brand, i) => (
+                  <div key={i} className="flex-shrink-0 w-40 h-20 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 hover:shadow-md transition-shadow">
+                    <span className="font-bold text-gray-400 text-lg">{brand}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </LayoutContainer>
+        </section>
+
+        {/* SECTION 6: RATE CARD TABLE */}
+        <section className="py-12 bg-white">
+          <LayoutContainer>
+            <div className="bg-orange-50 rounded-t-2xl p-4 text-center border border-orange-100">
+              <p className="text-orange-800 font-medium flex items-center justify-center gap-2">
+                <Info className="w-4 h-4" />
+                Labour Charges are capped at ₹499 per appliance
+              </p>
+            </div>
+            
+            <div className="border border-gray-200 rounded-b-2xl overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 className="font-bold text-gray-900">Electrical Parts</h3>
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              </div>
+              
+              <div className="p-6">
+                <div className="grid grid-cols-3 gap-4 mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  <div>Description</div>
+                  <div className="text-center">Service Charge</div>
+                  <div className="text-right">Labour</div>
+                </div>
+                
+                <div className="space-y-4">
+                  {rateCard.map((item, i) => (
+                    <div key={i} className="grid grid-cols-3 gap-4 text-sm py-3 border-b border-gray-100 last:border-0">
+                      <div className="font-medium text-gray-900">{item.part}</div>
+                      <div className="text-center text-gray-600">{item.charge}</div>
+                      <div className="text-right text-gray-600">{item.labour}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </LayoutContainer>
+        </section>
+
+        {/* SECTION 6.5: SERVICES SECTION */}
+        <ServicesSection />
+
+        {/* SECTION 7: FAQ */}
+        <section className="py-16 bg-gray-900">
+          <LayoutContainer>
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Frequently Asked Questions</h2>
+            
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="bg-gray-800 rounded-xl overflow-hidden transition-all">
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full flex items-center justify-between p-5 text-left"
+                  >
+                    <span className="font-medium text-white text-lg">{faq.question}</span>
+                    <ChevronDown 
+                      className={`w-5 h-5 text-orange-500 transition-transform duration-300 ${
+                        openFaq === index ? "rotate-180" : ""
+                      }`} 
+                    />
+                  </button>
+                  
+                  <div 
+                    className={`px-5 text-gray-400 overflow-hidden transition-all duration-300 ${
+                      openFaq === index ? "max-h-40 pb-5 opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    {faq.answer}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </LayoutContainer>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
