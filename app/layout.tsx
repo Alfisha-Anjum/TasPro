@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import Script from "next/script";
 
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/toaster";
@@ -27,6 +28,11 @@ export default function RootLayout({
         className={`${inter.className} bg-white dark:bg-gray-900`}
         suppressHydrationWarning
       >
+        <Script
+          id="razorpay-checkout"
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
         <Providers>
           <LayoutContent>{children}</LayoutContent>
 

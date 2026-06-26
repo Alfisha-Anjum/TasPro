@@ -295,7 +295,7 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <HomeStartupModal />
-{/* <Header />                           */}
+      {/* <Header />                           */}
       <main>
         <ServiceSection
           data={dashboardData?.categories || []}
@@ -327,7 +327,9 @@ useEffect(() => {
         <WhyChooseUs data={dashboardData?.why_choose_us || []} />
         <DownloadApp />
         <ServiceReels data={dashboardData?.reels || []} />
-        <ServicesSection />
+        <div className="sm:block hidden">
+          <ServicesSection />
+        </div>
       </main>
     </div>
   );

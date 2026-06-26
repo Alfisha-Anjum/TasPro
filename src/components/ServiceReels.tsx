@@ -15,7 +15,7 @@ export default function ServiceReels({ data = [] }: { data?: any[] }) {
   if (!data.length) return null;
 
   return (
-    <section className="mx-auto sm:px-0 px-2 sm:py-0 py-5">
+    <section className="mx-auto sm:px-0  sm:py-0 py-5">
       <LayoutContainer className="relative">
         <h2 className="text-2xl font-bold text-gray-900">Service Reels</h2>
         <p className="text-gray-500 mb-5">Watch our experts in action</p>
