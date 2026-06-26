@@ -10,6 +10,39 @@ import { SelectAddressModal } from "@/components/booking-flow/SelectAddressModal
 import AddNewAddressModal from "@/components/AddNewAddressModal";
 import DeepCleaningServices from "@/components/DeepCleaningServices";
 import axios from "axios";
+import Image from "next/image";
+
+
+const frequentlyAdded = [
+  {
+    id: 1,
+    title: "AC Repair (Split)",
+    price: 299,
+    originalPrice: 499,
+    image: "/ac.png",
+  },
+  {
+    id: 2,
+    title: "Drain Clean AC",
+    price: 499,
+    originalPrice: 799,
+    image: "/ac.png",
+  },
+  {
+    id: 3,
+    title: "AC Gas Refill",
+    price: 1499,
+    originalPrice: 1999,
+    image: "/ac.png",
+  },
+  {
+    id: 4,
+    title: "AC Installation",
+    price: 999,
+    originalPrice: 1299,
+    image: "/ac.png",
+  },
+];
 
 export default function CartPage() {
   const router = useRouter();
@@ -218,6 +251,10 @@ export default function CartPage() {
    }
  };
 
+  const handleAddItem = (item: any) => {
+    setCartItems((prev) => [...prev, item]);
+  };
+
 const handleDateTimeContinue = (
   date: string,
   time: string,
@@ -238,24 +275,27 @@ const handleDateTimeContinue = (
   return (
     <>
       <div className="min-h-screen dark:bg-gray-900">
-        <main className="max-w-7xl mx-auto px-3 md:px-5 lg:px-8">
+        <main className="max-w-7xl mx-auto  md:px-5 lg:px-8">
           <h1 className="hidden md:block text-2xl font-bold text-gray-900 dark:text-white mb-5">
             Cart Summary
           </h1>
 
-          <div className="w-full flex justify-between items-center md:hidden">
+          <div className="relative w-full flex items-center justify-center md:hidden pt-2">
             <button
               onClick={() => router.back()}
-              className="text-black dark:text-white font-medium flex items-center gap-2 hover:text-orange-500 transition"
+              className="absolute left-0 text-black dark:text-white hover:text-orange-500 transition"
             >
               <ArrowLeft size={20} />
-              View Cart
             </button>
+
+            <h1 className="text-sm font-semibold text-black dark:text-white">
+              Cart View
+            </h1>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-10">
             <div className="lg:col-span-2 space-y-6">
-              <div className="hidden md:block bg-white rounded-xl border border-gray-200 p-5">
+              <div className="hidden md:block  rounded-xl border border-gray-200 p-5">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Customer Details
                 </h2>
@@ -300,8 +340,8 @@ const handleDateTimeContinue = (
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-5">
+              <div className="sm:p-5 shadow-sm">
+                <h2 className="sm:block hidden text-lg font-semibold text-gray-900 mb-5">
                   Order Summary
                 </h2>
 
@@ -315,59 +355,181 @@ const handleDateTimeContinue = (
                       return (
                         <div
                           key={item.id}
-                          className="grid grid-cols-4 items-center py-2 gap-3"
+                          className="
+     rounded-xl sm:border-0 border border-[#E5E5E5] shadow-sm p-2
+
+    md:grid md:grid-cols-4 md:items-center md:gap-3
+    md:border-0 md:shadow-none md:rounded-none md:p-0
+  "
                         >
-                          <div className="min-w-0">
-                            <p className="text-[13px] md:text-sm text-gray-700 leading-5 font-medium truncate">
-                              {item.subService || item.name}
-                            </p>
-
-                            <p className="text-[12px] text-gray-400 leading-5 truncate">
-                              ({item.serviceName || "Service"})
-                            </p>
+                          <div
+                            key={item.id}
+                            className=" sm:grid-cols-4 items-center py-2 gap-3 hidden sm:grid"
+                          >
+                            {" "}
+                            <div className="min-w-0">
+                              {" "}
+                              <p className="text-[13px] md:text-sm text-gray-700 leading-5 font-medium truncate">
+                                {" "}
+                                {item.subService || item.name}{" "}
+                              </p>{" "}
+                              <p className="text-[12px] text-gray-400 leading-5 truncate">
+                                {" "}
+                                ({item.serviceName || "Service"}){" "}
+                              </p>{" "}
+                            </div>{" "}
+                            <div className="flex justify-center">
+                              {" "}
+                              <div className="flex items-center justify-between w-[90px] h-[28px] border border-[#FF6A00] rounded-[8px] px-3 shadow-[0_2px_8px_rgba(255,106,0,0.15)]">
+                                {" "}
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(item, "decrease")
+                                  }
+                                  className="text-[#FF6A00] text-[16px] leading-none"
+                                >
+                                  {" "}
+                                  −{" "}
+                                </button>{" "}
+                                <span className="text-[13px] text-black">
+                                  {" "}
+                                  {qty}{" "}
+                                </span>{" "}
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(item, "increase")
+                                  }
+                                  className="text-[#FF6A00] text-[16px] leading-none"
+                                >
+                                  {" "}
+                                  +{" "}
+                                </button>{" "}
+                              </div>{" "}
+                            </div>{" "}
+                            <div className="text-right">
+                              {" "}
+                              <p className="text-[13px] font-semibold text-black leading-4">
+                                {" "}
+                                ₹{price * qty}{" "}
+                              </p>{" "}
+                              {originalPrice ? (
+                                <p className="text-[11px] text-[#A0A0A0] line-through mt-1">
+                                  {" "}
+                                  ₹{originalPrice * qty}{" "}
+                                </p>
+                              ) : null}{" "}
+                            </div>{" "}
+                            <div className="flex justify-end">
+                              {" "}
+                              <button
+                                onClick={() => removeFromCart(item.id)}
+                                className="text-[#FF3B30]"
+                              >
+                                {" "}
+                                <Trash2 size={18} strokeWidth={1.7} />{" "}
+                              </button>{" "}
+                            </div>{" "}
                           </div>
+                          {/* Mobile Layout */}
+                          <div className="flex items-center gap-4 sm:hidden">
+                            {/* Image */}
+                            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex-shrink-0" />
 
-                          <div className="flex justify-center">
-                            <div className="flex items-center justify-between w-[90px] h-[28px] border border-[#FF6A00] rounded-[8px] px-3 shadow-[0_2px_8px_rgba(255,106,0,0.15)]">
+                            {/* Details */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-[12px] text-[#1A1A1A] truncate">
+                                {item.subService || item.name}
+                              </h3>
+
+                              <p className="text-[10px] text-[#777] mt-1 truncate">
+                                {item.serviceName || "testing"}
+                              </p>
+
+                              <p className="text-[#FF8A00] font-bold text-[14px] mt-1">
+                                ₹{price * qty}
+                              </p>
+                            </div>
+
+                            {/* Quantity */}
+                            <div className="flex items-center bg-[#F7F7F7] rounded-full px-2 py-1 gap-3">
                               <button
                                 onClick={() => updateQuantity(item, "decrease")}
-                                className="text-[#FF6A00] text-[16px] leading-none"
+                                className="w-4 h-4 rounded-full bg-[#EDEDED] flex items-center justify-center text-[22px]"
                               >
                                 −
                               </button>
 
-                              <span className="text-[13px] text-black">
+                              <span className="font-semibold text-[12px]">
                                 {qty}
                               </span>
 
                               <button
                                 onClick={() => updateQuantity(item, "increase")}
-                                className="text-[#FF6A00] text-[16px] leading-none"
+                                className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[22px]"
                               >
                                 +
                               </button>
                             </div>
                           </div>
 
-                          <div className="text-right">
-                            <p className="text-[13px] font-semibold text-black leading-4">
-                              ₹{price * qty}
-                            </p>
-
-                            {originalPrice ? (
-                              <p className="text-[11px] text-[#A0A0A0] line-through mt-1">
-                                ₹{originalPrice * qty}
+                          {/* Desktop Layout */}
+                          <div className="hidden md:contents">
+                            <div className="min-w-0">
+                              <p className="text-[13px] md:text-sm text-gray-700 leading-5 font-medium truncate">
+                                {item.subService || item.name}
                               </p>
-                            ) : null}
-                          </div>
 
-                          <div className="flex justify-end">
-                            <button
-                              onClick={() => removeFromCart(item.id)}
-                              className="text-[#FF3B30]"
-                            >
-                              <Trash2 size={18} strokeWidth={1.7} />
-                            </button>
+                              <p className="text-[12px] text-gray-400 leading-5 truncate">
+                                ({item.serviceName || "Service"})
+                              </p>
+                            </div>
+
+                            <div className="flex justify-center">
+                              <div className="flex items-center justify-between w-[90px] h-[28px] border border-[#FF6A00] rounded-[8px] px-3 shadow-[0_2px_8px_rgba(255,106,0,0.15)]">
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(item, "decrease")
+                                  }
+                                  className="text-[#FF6A00] text-[16px] leading-none"
+                                >
+                                  −
+                                </button>
+
+                                <span className="text-[13px] text-black">
+                                  {qty}
+                                </span>
+
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(item, "increase")
+                                  }
+                                  className="text-[#FF6A00] text-[16px] leading-none"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="text-right">
+                              <p className="text-[13px] font-semibold text-black leading-4">
+                                ₹{price * qty}
+                              </p>
+
+                              {originalPrice ? (
+                                <p className="text-[11px] text-[#A0A0A0] line-through mt-1">
+                                  ₹{originalPrice * qty}
+                                </p>
+                              ) : null}
+                            </div>
+
+                            <div className="flex justify-end">
+                              <button
+                                onClick={() => removeFromCart(item.id)}
+                                className="text-[#FF3B30]"
+                              >
+                                <Trash2 size={18} strokeWidth={1.7} />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -428,12 +590,73 @@ const handleDateTimeContinue = (
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              {/* MOBILE PAYMENT SUMMARY */}
+              <div className="sm:hidden  rounded-[20px]  shadow-sm">
+                <h2 className="text-[14px] font-semibold text-[#111] mb-2">
+                  Payment Summary
+                </h2>
+
+                <div className="space-y-3 border border-[#E5E5E5] p-3 py-5 rounded-xl">
+                  <div className="flex justify-between text-[#7A7A7A] text-[16px]">
+                    <span className="text-sm">Item Total</span>
+                    <span className="font-medium text-black text-sm">
+                      ₹{totalAmount.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-[#7A7A7A] text-[16px]">
+                    <span className="text-sm">Tax & Fee</span>
+                    <span className="font-medium text-black text-sm">
+                      ₹0.00
+                    </span>
+                  </div>
+
+                  <hr className="my-4" />
+
+                  <div className="flex justify-between font-semibold text-[20px] text-black">
+                    <span className="text-sm">Total</span>
+                    <span className="text-sm">₹{totalAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t shadow-xl border-gray-200 px-4 py-3 z-20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="border border-gray-300 rounded-lg px-3 py-1 text-sm font-medium">
+                      {cartItems.length} Item
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-[#222]">
+                          ₹{totalAmount}
+                        </span>
+
+                        {totalMRP > totalAmount && (
+                          <span className="text-sm text-gray-400 line-through">
+                            ₹{totalMRP}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={createCustomerCart}
+                    disabled={cartLoading}
+                    className="py-2 px-5 rounded-full bg-orange-500 text-white font-semibold text-sm"
+                  >
+                    {cartLoading ? "Loading..." : "Continue"}
+                  </button>
+                </div>
+              </div>
+              {/* DESKTOP PAYMENT SUMMARY */}
+              <div className="hidden sm:block rounded-2xl p-5 border border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Payment Summary
                 </h2>
 
-                <div className="space-y-3 text-sm mb-4">
+                <div className="space-y-3 text-sm mb-4  ">
                   <div className="flex justify-between text-gray-600">
                     <span>Total Item ({cartItems.length})</span>
                     <span>₹{totalMRP.toFixed(0)}</span>
@@ -467,6 +690,7 @@ const handleDateTimeContinue = (
                   <p className="text-xs text-gray-500 text-center mt-3">
                     🔒 Safe & secure checkout
                   </p>
+
                   <img
                     src="/grp.png"
                     alt="Payment Methods"
@@ -474,8 +698,7 @@ const handleDateTimeContinue = (
                   />
                 </div>
               </div>
-
-              <div className="flex justify-center items-center mx-auto gap-3 w-full">
+              <div className="hidden sm:flex justify-center items-center mx-auto gap-3 w-full">
                 <img src="/tick.png" alt="tick" className="w-8 h-6" />
                 <p className="text-sm font-bold text-[#666666] w-3/4">
                   Easy Cancellation/Returns, BackgroundVerified Service Provide.
@@ -485,8 +708,70 @@ const handleDateTimeContinue = (
           </div>
         </main>
 
-        <DeepCleaningServices title="Frequently Added Together" />
+        {/* <DeepCleaningServices title="Frequently Added Together" /> */}
 
+        <div className="p-5 px-0 lg:px-8">
+          <h3 className="font-semibold mb-2">Frequently Added Together</h3>
+
+          <div
+            className=" overflow-auto flex gap-3"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {frequentlyAdded.map((item) => (
+              <div
+                key={item.id}
+                className="
+      min-w-[110px] md:min-w-[70%] 
+      border rounded-xl bg-white
+      shadow-sm
+    "
+              >
+                {/* Image */}
+                <div className="relative w-full h-20 md:h-40 rounded-t-xl overflow-hidden">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="p-2 md:p-4">
+                  <p className="text-[10px] md:text-base font-medium line-clamp-2">
+                    {item.title || item.name}
+                  </p>
+
+                  <div className="mt-1 md:mt-3">
+                    <span className="font-semibold text-gray-900 text-xs md:text-lg">
+                      ₹{item.price}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleAddItem(item)}
+                    className="
+          mt-2 md:mt-4
+          w-full
+          border border-orange-500
+          text-orange-500
+          text-xs md:text-sm
+          font-medium
+          py-1.5 md:py-3
+          rounded-lg
+          hover:bg-orange-50
+        "
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         <SelectAddressModal
           isOpen={showAddressModal}
           onClose={() => setShowAddressModal(false)}

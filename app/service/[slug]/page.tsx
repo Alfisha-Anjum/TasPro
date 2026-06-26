@@ -21,6 +21,7 @@ import ServiceDetailsModal from "@/components/ServiceDetailsModal";
 import { SelectCapacityModal } from "@/components/booking-flow/SelectCapacityModal";
 import { AMCDurationModal } from "@/components/AMCDurationModal";
 import { Heart } from "lucide-react";
+import Image from "next/image";
 
 type SubService = {
   id: number | string;
@@ -474,7 +475,7 @@ const totalSavings = cartItems.reduce(
           </div>
 
           <div className="flex flex-col-reverse lg:flex-row gap-4 sm:gap-8 items-start">
-            <div className="w-full lg:w-1/2 order-2 lg:order-1 px-4 sm:px-0">
+            <div className="w-full lg:w-1/2 order-2 lg:order-1  sm:px-0">
               <h1 className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-white leading-snug">
                 Best {apiService?.name || service?.name} <br />
                 Service in {service?.city || "Your City"}
@@ -515,7 +516,7 @@ const totalSavings = cartItems.reduce(
                 <div className="mt-5 space-y-3">
                   <div
                     onClick={() => setShowWarrantyModal(true)}
-                    className="flex justify-between items-center border rounded-xl px-4 py-3 cursor-pointer hover:border-orange-500"
+                    className="flex justify-between items-center border rounded-xl py-3 cursor-pointer hover:border-orange-500"
                   >
                     <div className="flex gap-2 items-center">
                       <span>🏅</span>
@@ -595,16 +596,17 @@ const totalSavings = cartItems.reduce(
 
       <div className="w-full max-w-7xl pt-5 xl:px-2 sm:px-5 mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:py-5">
-          <div className="px-4 sm:px-0">
+          <div className=" sm:px-0">
             {offers.length > 0 && (
               <div className="sm:hidden mb-5">
                 <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
                   {offers.map((offer: any) => (
                     <div
                       key={offer.id}
-                      className="flex-shrink-0 border border-gray-400 rounded-full px-4 py-2 flex items-center gap-2 bg-white"
+                      className="flex-shrink-0 border border-gray-400 rounded-full px-4 py-1 flex items-center gap-2 bg-white"
                     >
-                      <span className="text-gray-500 text-sm">🎁</span>
+                      <i className={`${offer.icon} text-orange-500 text-sm`} />
+
                       <p className="text-xs font-medium text-gray-500 whitespace-nowrap">
                         {offer.text}
                       </p>
@@ -627,7 +629,7 @@ const totalSavings = cartItems.reduce(
               <div className="overflow-hidden">
                 <div
                   ref={tabsRef}
-                  className="flex gap-5 overflow-x-auto hide-scrollbar w-full px-2 py-2"
+                  className="flex gap-5 overflow-x-auto hide-scrollbar w-full py-2"
                 >
                   {tabs.map((tab: any) => (
                     <div key={tab.id} className="flex-shrink-0">
@@ -859,7 +861,7 @@ const totalSavings = cartItems.reduce(
               </div>
             </div>
           )}
-          <div className="lg:col-span-1 px-4 sm:px-0">
+          <div className="lg:col-span-1 sm:px-0">
             <div className="sticky top-24 space-y-0 sm:space-y-6">
               <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5 sticky top-20">
                 {cartItems.length === 0 ? (
