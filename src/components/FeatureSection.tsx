@@ -29,7 +29,7 @@ export default function FeatureSection() {
     <section className="py-1">
       <LayoutContainer>
         {/* Feature Container */}
-        <div className="w-full mx-auto h-auto lg:h-[122px] flex flex-col sm:flex-row justify-between items-center gap-[30px] sm:gap-[20px] opacity-100 transform-none">
+        <div className="w-full mx-auto h-auto lg:h-[122px] hidden sm:flex flex-col sm:flex-row justify-between items-center gap-[30px] sm:gap-[20px] opacity-100 transform-none">
           {features.map((feature) => (
             <div
               key={feature.id}

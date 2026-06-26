@@ -12,7 +12,7 @@ const LayoutContainer: React.FC<LayoutContainerProps> = ({
   className = "" 
 }) => {
   return (
-    <div className={` max-w-[90%] mx-auto sm:px-0 lg:px-8 ${className}`}>
+    <div className={` w-full sm:max-w-[90%] mx-auto sm:px-0 lg:px-8 ${className}`}>
       {children}
     </div>
   );

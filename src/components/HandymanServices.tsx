@@ -61,7 +61,7 @@ const HandymanServices = ({ data = [] }: { data?: any[] }) => {
         }))
       : handymanServices;
   return (
-    <section className="pt-5 w-full sm:max-w-[90%] mx-auto px-2 sm:px-0 lg:px-8">
+    <section className="pt-5 w-full sm:max-w-[90%] mx-auto sm:px-0 lg:px-8">
       <div className="">
         <h2 className="text-lg sm:text-2xl font-bold text-foreground dark:text-gray-200 mb-2">
           Handyman Services

@@ -143,7 +143,7 @@ export default function ServiceSection({
   const finalServices = data.length > 0 ? data : services;
 
   return (
-    <section className="w-full pb-10 px-2 sm:px-5">
+    <section className="w-full sm:pb-10  sm:px-5">
       <LayoutContainer className="relative">
         <div className="flex flex-col lg:flex-row justify-between items-start">
           {/* Left Side - Service Cards */}
@@ -155,7 +155,7 @@ export default function ServiceSection({
             </h2>
 
             <div
-              className={`grid grid-cols-3 gap-x-3 gap-y-5 xl:pb-0 pb-10 ${
+              className={`grid grid-cols-3 sm:grid-cols-4 gap-x-3 gap-y-5 xl:pb-0 sm:pb-10 ${
                 finalServices.length > 6
                   ? "max-h-[320px] overflow-y-auto pr-2"
                   : ""
@@ -193,7 +193,7 @@ export default function ServiceSection({
           </div>
 
           {/* Right Side - Hero Image Banner */}
-          <div className="w-full lg:w-[60%] relative h-[300px] lg:h-[450px] rounded-3xl overflow-hidden shadow-xl group lg:ml-8">
+          <div className="w-full sm:block hidden lg:w-[60%] relative h-[300px] lg:h-[450px] rounded-3xl overflow-hidden shadow-xl group lg:ml-8">
             <Image
               src="/heroimage.jpg"
               alt="Home Services"

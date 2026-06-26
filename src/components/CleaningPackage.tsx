@@ -106,7 +106,7 @@ const checkScrollState = () => {
      return (
        <>
          {/* Mobile */}
-         <div className="block sm:hidden w-full px-2">{children}</div>
+         <div className="block sm:hidden w-full ">{children}</div>
 
          {/* sm and above */}
          <div className="hidden sm:block">
