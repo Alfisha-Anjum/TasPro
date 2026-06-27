@@ -155,7 +155,7 @@ export default function ServiceSection({
             </h2>
 
             <div
-              className={`grid grid-cols-3 sm:grid-cols-4 gap-x-3 gap-y-5 xl:pb-0 sm:pb-10 ${
+              className={`grid  grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-x-3 gap-y-5 xl:pb-0 sm:pb-10 ${
                 finalServices.length > 6
                   ? "max-h-[320px] overflow-y-auto pr-2"
                   : ""
