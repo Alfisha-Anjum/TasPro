@@ -23,6 +23,7 @@ import {
   ClipboardList,
   Wrench,
   House,
+  PlusCircle,
 } from "lucide-react";
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -46,7 +47,7 @@ import { AccountSidebar } from "@/components/account";
 import Breadcrumb from "@/components/account/Breadcrumb";
 import { usePathname, useSearchParams } from "next/navigation";
 import axios from "axios";
-
+import toast from "react-hot-toast";
 // import { AddNewAddressModal } from "@/components/booking-flow/AddNewAddressModal";
 
 const MyBookingContent = () => {
@@ -57,9 +58,11 @@ const MyBookingContent = () => {
   const [activeTab, setActiveTab] = useState<
     "pending" | "rejected" | "completed"
   >("pending");
- const bookingType = (searchParams?.get("tab") ?? "home") as "home" | "amc";
+  const bookingType = (searchParams?.get("tab") ?? "home") as "home" | "amc";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSplitModal, setShowSplitModal] = useState(false);
+  const [trackingData, setTrackingData] = useState<any[]>([]);
+  const [showTracking, setShowTracking] = useState(false);
   const [showAMCDetailsPage, setShowAMCDetailsPage] = useState(false);
   const [showChatBot, setShowChatBot] = useState(false);
   const [selectedChatBooking, setSelectedChatBooking] = useState<any>(null);
@@ -78,6 +81,9 @@ const MyBookingContent = () => {
   // AMC Specific States
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [showAlternateModal, setShowAlternateModal] = useState(false);
+  const [alternateNumber, setAlternateNumber] = useState("");
+  const [savingAlternate, setSavingAlternate] = useState(false);
   const [showAMCDetailsModal, setShowAMCDetailsModal] = useState(false);
   const [selectedAMC, setSelectedAMC] = useState<any>(null);
   const [openSections, setOpenSections] = useState<string[]>([
@@ -98,7 +104,24 @@ const MyBookingContent = () => {
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const trackingInfo = bookingDetails?.tracking_info;
 
+  const [customerAddress, setCustomerAddress] = useState<any>(null);
+
+  
+ 
+  const currentStep =
+    trackingInfo?.tracking_steps?.find(
+      (step: any) => step.id === trackingInfo.current_status_id,
+    ) || trackingInfo?.tracking_steps?.[0];
+
+  // Progress badge
+  const badgeText =
+    currentStep?.status === "completed"
+      ? "COMPLETED"
+      : currentStep?.status === "in_progress"
+        ? "IN PROGRESS"
+        : currentStep?.status?.toUpperCase() || "PENDING";
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -127,12 +150,107 @@ const MyBookingContent = () => {
     }
   };
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
+ useEffect(() => {
+   fetchBookings();
+   fetchCustomerAddress();
+ }, []);
 
-  // import axios from "axios";
+   const fetchCustomerAddress = async () => {
+    const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`${BASE_URL}/customers/customer-addresses`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
+    if (res.data.status && res.data.data.length > 0) {
+      setCustomerAddress(res.data.data[0]);
+
+      setAlternateNumber(
+        res.data.data[0].alt_contact_number || ""
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+const handleSaveAlternateNumber = async () => {
+  if (alternateNumber.length !== 10) {
+    toast.error("Enter a valid mobile number");
+    return;
+  }
+
+  if (!customerAddress) {
+    toast.error("Customer address not found");
+    return;
+  }
+
+  try {
+    setSavingAlternate(true);
+const token = localStorage.getItem("token");
+
+ const payload = {
+   full_name: customerAddress.full_name,
+   contact_number: customerAddress.contact_number,
+   alt_contact_number: alternateNumber,
+   postal_code: customerAddress.postal_code,
+   latitude: customerAddress.latitude,
+   longitude: customerAddress.longitude,
+   state_name: customerAddress.state.name,
+   city_name: customerAddress.city.name.replace("Unknown Type: ", ""),
+   house_number: customerAddress.house_number,
+   street: customerAddress.street,
+   type: customerAddress.type,
+   is_active: customerAddress.is_active,
+ };
+
+ console.log("Payload:", payload);
+
+ const response = await axios.put(
+   `${BASE_URL}/customers/customer-addresses/${customerAddress.id}`,
+   payload,
+   {
+     headers: {
+       Authorization: `Bearer ${token}`,
+       Accept: "application/json",
+       "Content-Type": "application/json",
+     },
+   },
+ );
+
+ await fetchCustomerAddress();
+
+console.log("Updated Address:", customerAddress);
+
+ console.log("Response:", response.data);
+    // Update local state
+    setCustomerAddress((prev: any) => ({
+      ...prev,
+      alt_contact_number: alternateNumber,
+    }));
+
+    // Update booking UI
+    setBookingDetails((prev: any) => ({
+      ...prev,
+      customer_details: {
+        ...prev.customer_details,
+        alt_mobile: alternateNumber,
+      },
+    }));
+
+    toast.success("Alternate number updated");
+
+    setShowAlternateModal(false);
+  } catch (error: any) {
+    console.log(error.response?.data);
+    toast.error(error.response?.data?.message || "Unable to update");
+  } finally {
+    setSavingAlternate(false);
+  }
+};
   const cancelBooking = async (bookingId: number, data: any) => {
     const token = localStorage.getItem("token");
 
@@ -223,6 +341,34 @@ const MyBookingContent = () => {
     }
   };
 
+  // import axios from "axios";
+const handleTrackDetails = async (bookingId: number) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get(
+      `${BASE_URL}/customers/customer-bookings/${bookingId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      },
+    );
+
+    console.log("Track Details:", res.data);
+
+    // Save complete booking details
+    setBookingDetails(res.data.data);
+
+    // Or if you only want tracking steps
+    setTrackingData(res.data.data?.tracking_info?.tracking_steps || []);
+
+    setShowTracking(true);
+  } catch (err: any) {
+    console.log(err.response?.data || err.message);
+  }
+};
   const [amcBookings, setAmcBookings] = useState([
     {
       id: "AMC-001",
@@ -901,7 +1047,7 @@ const MyBookingContent = () => {
               )}
 
               {showBookingDetailsPage && selectedBooking && (
-                <div className="bg-[#f6f7f9] min-h-screen w-full max-w-full overflow-x-hidden rounded-2xl px-3 sm:px-2 lg:px-8">
+                <div className="bg-[#f6f7f9] min-h-screen w-full max-w-full overflow-x-hidden rounded-2xl sm:px-2 lg:px-8">
                   {/* Back */}
                   {/* <button
                 onClick={() => setShowBookingDetailsPage(false)}
@@ -913,7 +1059,7 @@ const MyBookingContent = () => {
                   <div className="flex flex-col lg:flex-row w-full max-w-[1100px] gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 mx-auto">
                     <div className="space-y-6 w-full lg:max-w-sm min-w-0">
                       {/* SERVICE CARD */}
-                      <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border flex flex-row gap-3 sm:gap-4 items-start">
+                      {/* <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border flex flex-row gap-3 sm:gap-4 items-start">
                         <img
                           src={"/ac.png"}
                           className="w-20 h-20 rounded-lg object-cover"
@@ -960,12 +1106,236 @@ const MyBookingContent = () => {
                             />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
+                      {/* SERVICE CARD */}
+                      <div className="bg-white rounded-2xl shadow-sm border p-4">
+                        {/* Mobile Layout */}
+                        <div className="block sm:hidden">
+                          <div className="flex justify-between items-start py-4">
+                            <h2 className="font-semibold text-[15px] text-gray-900">
+                              {bookingDetails?.service_details?.title}
+                            </h2>
 
+                            <button className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center">
+                              <img
+                                src="/call.png"
+                                alt="call"
+                                className="w-4 h-4 cursor-pointer"
+                              />
+                            </button>
+                          </div>
+
+                          <hr className="py-2" />
+
+                          {bookingDetails?.service_details?.items?.map(
+                            (item: any, index: number) => (
+                              <div
+                                key={index}
+                                className="flex justify-between items-end"
+                              >
+                                <div>
+                                  <p className="text-xs text-gray-500">
+                                    {item.subtitle}
+                                  </p>
+
+                                  <p className="text-orange-500 font-bold text-[16px] mt-1">
+                                    ₹{item.price}
+                                  </p>
+                                </div>
+
+                                <p className="text-sm text-gray-500">
+                                  Qty: <span className="text-gray-700">1</span>
+                                </p>
+                              </div>
+                            ),
+                          )}
+                        </div>
+
+                        {/* Desktop Layout (Existing Design) */}
+                        <div className="hidden sm:flex flex-row gap-4 items-start">
+                          <img
+                            src="/ac.png"
+                            className="w-20 h-20 rounded-lg object-cover"
+                          />
+
+                          <div className="flex flex-row w-full justify-between gap-3">
+                            <div className="flex-1">
+                              <h2 className="font-bold text-[clamp(14px,1.5vw,18px)]">
+                                {bookingDetails?.service_details?.title}
+                              </h2>
+
+                              {bookingDetails?.service_details?.items?.map(
+                                (item: any, index: number) => (
+                                  <div key={index} className="mt-2">
+                                    <p className="text-sm text-gray-500">
+                                      {item.subtitle}
+                                    </p>
+                                    <p className="text-orange-600 font-bold">
+                                      ₹{item.price}
+                                    </p>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+
+
+                            
+
+                            <div className="flex gap-3 p-2">
+                              <img
+                                src={
+                                  bookingDetails?.service_details?.items?.[0]
+                                    ?.image || "/ac.png"
+                                }
+                                alt="chat"
+                                className="w-5 h-5 cursor-pointer"
+                                onClick={() => handleOpenChat(selectedBooking)}
+                              />
+
+                              <img
+                                src="/call.png"
+                                alt="call"
+                                className="w-5 h-5 cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-white border rounded-xl shadow-sm">
+                        <div className="block sm:hidden p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span
+                                className={`inline-block text-[10px] font-semibold px-2 py-1 rounded
+            ${
+              currentStep?.status === "completed"
+                ? "bg-green-100 text-green-700"
+                : currentStep?.status === "in_progress"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-gray-100 text-gray-700"
+            }`}
+                              >
+                                {badgeText}
+                              </span>
+
+                              <h3
+                                className={`mt-2 font-bold text-sm ${
+                                  currentStep?.status === "completed"
+                                    ? "text-green-600"
+                                    : currentStep?.status === "in_progress"
+                                      ? "text-yellow-600"
+                                      : "text-gray-700"
+                                }`}
+                              >
+                                {currentStep?.title}
+                              </h3>
+
+                              <p className="text-gray-500 text-sm mt-1">
+                                Current Status
+                              </p>
+                            </div>
+
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                currentStep?.status === "completed"
+                                  ? "bg-green-500"
+                                  : currentStep?.status === "in_progress"
+                                    ? "bg-yellow-500"
+                                    : "bg-gray-400"
+                              }`}
+                            >
+                              <span className="text-white text-base">
+                                {currentStep?.status === "completed"
+                                  ? "✓"
+                                  : "•"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <hr className="mt-4 mb-2" />
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() =>
+                                handleTrackDetails(
+                                  selectedBooking?.booking_id ||
+                                    selectedBooking?.id,
+                                )
+                              }
+                              className="text-blue-500 font-medium text-sm "
+                            >
+                              Track Details →
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      {showTracking && (
+                        <div className="fixed inset-0 z-50 flex items-end bg-black/40">
+                          <div className="w-full bg-white rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto animate-slide-up">
+                            {/* Header */}
+                            <div className="flex items-center gap-3 mb-6">
+                              <button onClick={() => setShowTracking(false)}>
+                                ←
+                              </button>
+
+                              <h2 className="text-xl font-bold flex-1 text-center">
+                                Track Order
+                              </h2>
+                            </div>
+
+                            {/* Timeline */}
+                            <div className="space-y-6">
+                              {trackingData.map((item, index) => (
+                                <div key={index} className="flex gap-4">
+                                  {/* Left Line */}
+                                  <div className="flex flex-col items-center">
+                                    <div
+                                      className={`w-5 h-5 rounded-full border-2 ${
+                                        item.completed
+                                          ? "bg-green-500 border-green-500"
+                                          : "border-gray-300"
+                                      }`}
+                                    />
+
+                                    {index !== trackingData.length - 1 && (
+                                      <div
+                                        className={`w-1 h-24 ${
+                                          item.completed
+                                            ? "bg-green-500"
+                                            : "bg-gray-300"
+                                        }`}
+                                      />
+                                    )}
+                                  </div>
+
+                                  {/* Card */}
+                                  <div
+                                    className={`flex-1 rounded-2xl shadow border p-4 ${
+                                      item.active
+                                        ? "border-green-500 bg-green-50"
+                                        : "border-gray-200"
+                                    }`}
+                                  >
+                                    <h3 className="font-bold">{item.title}</h3>
+
+                                    <p className="text-sm text-gray-500">
+                                      {item.date}
+                                    </p>
+
+                                    <p className="text-gray-600 mt-2">
+                                      {item.description}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       {/* COUPONS */}
+
                       <div
                         onClick={() => setShowOffers(!showOffers)}
-                        className="bg-white rounded-xl p-5 shadow-sm border flex justify-between items-center cursor-pointer"
+                        className="bg-white rounded-xl p-5 shadow-sm border hidden sm:flex justify-between items-center cursor-pointer"
                       >
                         <span className="text-gray-600 font-medium text-[clamp(14px,1.5vw,18px)]">
                           Coupons & Offers
@@ -1008,13 +1378,13 @@ const MyBookingContent = () => {
                           <h3 className="font-semibold text-[clamp(14px,1.5vw,18px)]">
                             Customer Details
                           </h3>
-
+                          {/* 
                           <button
                             onClick={() => setShowSelectAddressModal(true)}
                             className="text-orange-500 hover:text-orange-600 transition"
                           >
                             <Pencil className="w-4 h-4 fill-orange-500 stroke-orange-500" />
-                          </button>
+                          </button> */}
                         </div>
 
                         <p className="font-medium">
@@ -1028,7 +1398,28 @@ const MyBookingContent = () => {
                         <p className="text-sm text-gray-600 mt-3">
                           C.N. : {bookingDetails?.customer_details?.phone}
                         </p>
+                        {bookingDetails?.customer_details?.alt_mobile ? (
+                          <p className="text-sm text-gray-600 mt-2">
+                            Alternate No. :{" "}
+                            {bookingDetails.customer_details.alt_mobile}
+                          </p>
+                        ) : null}
 
+                        <button
+                          onClick={() => {
+                            setAlternateNumber(
+                              bookingDetails?.customer_details?.alt_mobile ||
+                                "",
+                            );
+                            setShowAlternateModal(true);
+                          }}
+                          className="mt-3 flex items-center gap-2 text-[#1E88E5] text-sm font-medium"
+                        >
+                          <PlusCircle className="w-4 h-4" />
+                          {bookingDetails?.customer_details?.alt_mobile
+                            ? "Edit Alternate Number"
+                            : "Add Alternate Number"}
+                        </button>
                         {/* <div className="mt-4 flex gap-3">
                           <input
                             placeholder="Apply Coupon"
@@ -1038,6 +1429,54 @@ const MyBookingContent = () => {
                             Apply
                           </button>
                         </div> */}
+                        {showAlternateModal && (
+                          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+                            <div className="relative bg-white rounded-3xl w-full max-w-md p-6">
+                              <button
+                                onClick={() => setShowAlternateModal(false)}
+                                className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-orange-500 text-white"
+                              >
+                                ✕
+                              </button>
+
+                              <h2 className="text-3xl font-bold text-center">
+                                Add Alternate Number
+                              </h2>
+
+                              <p className="text-center text-gray-500 mt-3">
+                                Enter an alternate phone number for service
+                                communication.
+                              </p>
+
+                              <div className="mt-8">
+                                <label className="font-semibold">
+                                  Alternate Phone Number
+                                </label>
+
+                                <input
+                                  type="tel"
+                                  maxLength={10}
+                                  value={alternateNumber}
+                                  onChange={(e) =>
+                                    setAlternateNumber(
+                                      e.target.value.replace(/\D/g, ""),
+                                    )
+                                  }
+                                  placeholder="e.g. 9876543210"
+                                  className="mt-2 w-full border rounded-xl px-4 py-4"
+                                />
+                              </div>
+
+                              <button
+                                onClick={handleSaveAlternateNumber}
+                                disabled={savingAlternate}
+                                className="mt-8 w-full rounded-full bg-orange-500 text-white font-semibold py-4"
+                              >
+                                {savingAlternate ? "Saving..." : "Save Number"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="hidden bg-white rounded-xl p-4 sm:p-5 shadow-sm border relative">
                         <h2 className="text-[clamp(14px,1.5vw,18px)] font-bold text-start">
@@ -1322,26 +1761,32 @@ const MyBookingContent = () => {
                         </div>
                       </div>
 
-                      <div className=" bg-white rounded-xl p-5 shadow-sm border">
-                        <h3 className="font-semibold mb-3">Work Status</h3>
+                      {/* WORK STATUS */}
+                      <div className="bg-white rounded-xl shadow-sm border">
+                        {/* Mobile Layout */}
 
-                        <ul className="space-y-3 text-sm">
-                          {bookingDetails?.tracking_info?.tracking_steps?.map(
-                            (step: any) => (
-                              <li
-                                key={step.id}
-                                className={
-                                  step.status === "completed"
-                                    ? "text-green-600"
-                                    : "text-gray-400"
-                                }
-                              >
-                                {step.status === "completed" ? "✔" : "○"}{" "}
-                                {step.title}
-                              </li>
-                            ),
-                          )}
-                        </ul>
+                        {/* Desktop Layout (Existing) */}
+                        <div className="hidden sm:block p-5">
+                          <h3 className="font-semibold mb-3">Work Status</h3>
+
+                          <ul className="space-y-3 text-sm">
+                            {bookingDetails?.tracking_info?.tracking_steps?.map(
+                              (step: any) => (
+                                <li
+                                  key={step.id}
+                                  className={
+                                    step.status === "completed"
+                                      ? "text-green-600"
+                                      : "text-gray-400"
+                                  }
+                                >
+                                  {step.status === "completed" ? "✔" : "○"}{" "}
+                                  {step.title}
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1908,6 +2353,6 @@ const MyBookingContent = () => {
       {/* <Footer / */}
     </div>
   );
-};
+};;
 
 export default MyBookingContent;
