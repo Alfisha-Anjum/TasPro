@@ -9,7 +9,7 @@ import { AddNewAddressModal } from "./AddNewAddressModal";
 import { OrderSummaryModal } from "./OrderSummaryModal";
 import { PaymentOptionModal } from "./PaymentOptionModal";
 import { OTPModal } from "./OTPModal";
-
+import Swal from "sweetalert2";
 interface BookingFlowProps {
   isOpen: boolean;
   onClose: () => void;
@@ -89,22 +89,32 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({
     setCurrentStep(8);
   };
 
-  const handleOTPVerify = (otp: string) => {
-    console.log("Booking confirmed with OTP:", otp);
-    alert("Booking successful! Your service has been confirmed.");
-    setCurrentStep(1);
-    setBookingData({
-      acType: "",
-      capacity: "",
-      date: "",
-      time: "",
-      notes: "",
-      address: null,
-      paymentMethod: "",
-    });
-    onClose();
-    onSuccess?.();
-  };
+ const handleOTPVerify = async (otp: string) => {
+   console.log("Booking confirmed with OTP:", otp);
+
+   await Swal.fire({
+     icon: "success",
+     title: "Booking Confirmed!",
+     text: "Your service has been booked successfully.",
+     timer: 2000,
+     showConfirmButton: false,
+   });
+
+   setCurrentStep(1);
+
+   setBookingData({
+     acType: "",
+     capacity: "",
+     date: "",
+     time: "",
+     notes: "",
+     address: null,
+     paymentMethod: "",
+   });
+
+   onClose();
+   onSuccess?.();
+ };
 
   if (!isOpen) return null;
 

@@ -6,6 +6,7 @@ import CartPanel from './CartPanel';
 import { Star, CheckCircle2, ChevronDown, Clock, ShieldCheck, BadgePercent } from 'lucide-react';
 import nikImg from './nik.png';
 import Image from 'next/image';
+import Swal from "sweetalert2";
 
 // Dynamic data
 const serviceTypes = [
@@ -127,13 +128,41 @@ const [activeServiceType, setActiveServiceType] =
 const handleServiceTypeChange = (typeId: ServiceType) => {
   setActiveServiceType(typeId);
 };
-const handleCheckout = () => {
-    // Implement checkout logic here
-    alert('Proceeding to checkout with ' + cartItems.length + ' items in cart.');
-  };
+const handleCheckout = async () => {
+  if (cartItems.length === 0) {
+    await Swal.fire({
+      icon: "warning",
+      title: "Cart is Empty",
+      text: "Please add at least one service before checkout.",
+      confirmButtonColor: "#f97316",
+    });
+    return;
+  }
 
-const handleAddToCart = (service: ServiceItem) => {
+  await Swal.fire({
+    icon: "success",
+    title: "Proceeding to Checkout",
+    text: `You have ${cartItems.length} item${
+      cartItems.length > 1 ? "s" : ""
+    } in your cart.`,
+    confirmButtonColor: "#f97316",
+  });
+
+  // Navigate to checkout page if needed
+  // router.push("/checkout");
+};
+
+const handleAddToCart = async (service: ServiceItem) => {
   setCartItems((prev) => [...prev, { ...service, quantity: 1 }]);
+
+  await Swal.fire({
+    icon: "success",
+    title: "Added to Cart",
+    text: `${service.title} has been added to your cart.`,
+    timer: 1500,
+    showConfirmButton: false,
+  });
+
   router.push("/rate-card");
 };
 

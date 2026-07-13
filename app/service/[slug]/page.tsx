@@ -23,6 +23,7 @@ import { AMCDurationModal } from "@/components/AMCDurationModal";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 
+
 type SubService = {
   id: number | string;
   name: string;
@@ -119,6 +120,12 @@ const {
     service_issue_id: subService.id,
   };
 
+  console.log(newItem);
+  console.log({
+    final_price: subService.final_price,
+    strike_price: subService.strike_price,
+    base_price: subService.base_price,
+  });
   const hasDifferentService =
     cartItems.length > 0 &&
     cartItems.some((item: any) => Number(item.service_id) !== Number(serviceId));
@@ -126,6 +133,7 @@ const {
   if (hasDifferentService) {
     setPendingCartItem(newItem);
     setShowDifferentServiceModal(true);
+    
     return;
   }
 
@@ -317,7 +325,9 @@ useEffect(() => {
       rating: Number(item.rating || 0),
       reviews: item.reviews || 0,
       duration: `${item.duration_minutes || 30} min`,
-      discountedPrice: Number(item.final_price || 0),
+      discountedPrice: Number(
+        item.final_price ?? item.price ?? item.discount_price ?? 0,
+      ),
       originalPrice: Number(item.strike_price || item.base_price || 0),
       warrantyDays: item.warranty_days,
       warrantyDescription: item.warranty_description,
@@ -390,53 +400,6 @@ useEffect(() => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  // const addToCart = (serviceItem: SubService) => {
-  //   setCartItems((prev) => {
-  //     const existing = prev.find((item) => item.id === serviceItem.id);
-
-  //     if (existing) {
-  //       return prev.map((item) =>
-  //         item.id === serviceItem.id
-  //           ? { ...item, quantity: item.quantity + 1 }
-  //           : item,
-  //       );
-  //     }
-
-  //     return [...prev, { ...serviceItem, quantity: 1 }];
-  //   });
-  // };
-
-//  const addToCart = (subService: SubService) => {
-//    const cartItem: CartItemService = {
-//      ...subService,
-//      quantity: 1,
-
-//      service_id: Number(serviceId),
-//      service_category_id: apiService?.service_category_id || apiService?.id,
-
-//      service_sub_category_id:
-//        (subService as any).service_sub_category_id ||
-//        (subService as any).sub_category_id ||
-//        activeTab,
-
-//      service_issue_id: subService.id,
-//    } as any;
-
-//    setCartItems((prev) => {
-//      const existing = prev.find((item) => item.id === subService.id);
-
-//      if (existing) {
-//        return prev.map((item) =>
-//          item.id === subService.id
-//            ? { ...item, quantity: item.quantity + 1 }
-//            : item,
-//        );
-//      }
-
-//      return [...prev, cartItem];
-//    });
-//  };
-
 const updateQuantity = (
   service: any,
   type: "increase" | "decrease"
@@ -462,8 +425,8 @@ const totalSavings = cartItems.reduce(
   return (
     <>
       <section>
-        <div className="w-full max-w-7xl mx-auto sm:px-5">
-          <div className="text-sm sm:text-base md:text-lg text-gray-600 py-4 sm:block hidden">
+        <div className="w-full max-w-7xl mx-auto lg:px-5">
+          <div className="text-sm sm:text-base md:text-lg text-gray-600 px-5 py-4 sm:block hidden">
             <Link href="/" className="hover:text-[#FF6A00]">
               Home
             </Link>
@@ -474,8 +437,8 @@ const totalSavings = cartItems.reduce(
             </span>
           </div>
 
-          <div className="flex flex-col-reverse lg:flex-row gap-4 sm:gap-8 items-start">
-            <div className="w-full lg:w-1/2 order-2 lg:order-1  sm:px-0">
+          <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-10 items-start w-full sm:px-5">
+            <div className="w-[450px] pr-10">
               <h1 className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-white leading-snug">
                 Best {apiService?.name || service?.name} <br />
                 Service in {service?.city || "Your City"}
@@ -503,7 +466,7 @@ const totalSavings = cartItems.reduce(
                 </span>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-4 mt-6 relative max-w-lg sm:block hidden">
+              <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl px-6 py-4 mt-6 relative max-w-lg sm:block hidden">
                 <div className="absolute -top-3 left-5 bg-white px-3 py-1 border rounded-lg flex items-center gap-2">
                   <div className="w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-xs">
                     ✓
@@ -516,7 +479,7 @@ const totalSavings = cartItems.reduce(
                 <div className="mt-5 space-y-3">
                   <div
                     onClick={() => setShowWarrantyModal(true)}
-                    className="flex justify-between items-center border rounded-xl py-3 cursor-pointer hover:border-orange-500"
+                    className="flex justify-between items-center border rounded-xl px-4 py-3 cursor-pointer hover:border-orange-500"
                   >
                     <div className="flex gap-2 items-center">
                       <span>🏅</span>
@@ -543,13 +506,13 @@ const totalSavings = cartItems.reduce(
               </div>
             </div>
 
-            <div className="w-full lg:w-1/2 order-1 lg:order-2">
+            <div className="flex-1 min-w-0">
               <div className="relative w-full rounded-[24px] overflow-hidden group">
                 {/* Banner Image */}
                 <img
                   src={banners[currentBanner]}
                   alt="banner"
-                  className="w-full h-[300px]  object-cover transition-all duration-500"
+                  className="w-full h-full md:h-[300px]  object-cover transition-all duration-500"
                 />
 
                 {/* Left Button */}
@@ -594,11 +557,11 @@ const totalSavings = cartItems.reduce(
         </div>
       </section>
 
-      <div className="w-full max-w-7xl pt-5 xl:px-2 sm:px-5 mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:py-5">
-          <div className=" sm:px-0">
+      <div className="w-full max-w-7xl pt-5 mx-auto sm:px-5">
+        <div className="flex flex-col lg:flex-row gap-8 ">
+          <div className="w-full lg:w-[60%] lg:flex-none">
             {offers.length > 0 && (
-              <div className="sm:hidden mb-5">
+              <div className="sm:hidden mb-5 ">
                 <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
                   {offers.map((offer: any) => (
                     <div
@@ -673,7 +636,7 @@ const totalSavings = cartItems.reduce(
               )}
             </div>
 
-            <div className="lg:col-span-6 mt-14">
+            <div className=" mt-14">
               <div
                 className={`${
                   displayServices.length > 2
@@ -689,7 +652,7 @@ const totalSavings = cartItems.reduce(
                     key={subService.id}
                     className="sm:w-[80%] w-full lg:max-w-lg"
                   >
-                    <div className="sm:shadow-none shadow-lg rounded-xl py-4 sm:px-0 px-4">
+                    <div className="sm:shadow-none shadow-lg rounded-xl py-4 px-4 w-full">
                       <div className="flex gap-4">
                         <div className="flex flex-col items-center">
                           <div className="relative w-28 h-28 rounded-lg overflow-hidden bg-gray-100">
@@ -755,10 +718,11 @@ const totalSavings = cartItems.reduce(
                                     ? subService.rating.toFixed(1)
                                     : "0.0"}
                                 </span>
-                                <span>
+                                {/* <span>
                                   ({Math.round(subService.reviews / 1000)}m
                                   reviews)
-                                </span>
+                                </span> */}
+                                <span>({subService.reviews} reviews)</span>
                               </div>
 
                               <div className="flex gap-2 py-2">
@@ -861,15 +825,28 @@ const totalSavings = cartItems.reduce(
               </div>
             </div>
           )}
-          <div className="lg:col-span-1 sm:px-0">
-            <div className="sticky top-24 space-y-0 sm:space-y-6">
-              <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5 sticky top-20">
+          <div className="flex-1  w-[30%] flex-shrink-0">
+            <div className="flex flex-col items-start lg:items-end space-y-0 sm:space-y-6 max-w-[30%]">
+              <div
+                className="
+    bg-white
+    rounded-xl
+    border
+    border-gray-200
+    p-5
+    mb-5
+    sticky
+    top-20
+    w-full
+
+  "
+              >
                 {cartItems.length === 0 ? (
                   <div className="text-center">
                     <img
                       src="/pana.png"
                       alt="Empty Cart"
-                      className="mx-auto mb-4 w-[200px] h-[200px] object-contain"
+                      className="mx-auto mb-4  object-contain"
                     />
                     <p className="text-gray-600 font-medium mb-2">
                       Your Cart is empty
@@ -887,7 +864,7 @@ const totalSavings = cartItems.reduce(
                     <div
                       className={`cart-scroll mb-4 space-y-4 ${
                         cartItems.length > 3
-                          ? "h-[110px] overflow-y-auto overscroll-contain pr-2"
+                          ? "h-[110px] overflow-y-auto overscroll-contain pr-2 "
                           : ""
                       }`}
                     >
@@ -992,7 +969,10 @@ const totalSavings = cartItems.reduce(
                 </Link>
               </div>
 
-              <div className="border rounded-xl p-5 mb-6 sm:block hidden">
+              <div
+                className="border rounded-xl p-5 mb-6 sm:block hidden    w-full
+  "
+              >
                 <h4 className="font-semibold text-sm text-gray-900 dark:text-white mb-3">
                   Why TASPro Company
                 </h4>
@@ -1016,12 +996,15 @@ const totalSavings = cartItems.reduce(
                 ))}
               </div>
 
-              <div className="mb-6 border border-orange-500 rounded-xl px-4 py-3 sm:block hidden">
+              <div
+                className="mb-6 border border-orange-500 rounded-xl px-4 py-3 sm:block hidden  w-full
+   "
+              >
                 <button
                   onClick={() => setShowCoupons(!showCoupons)}
                   className="w-full flex items-center justify-between"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 ">
                     <img src="/coupon.png" alt="coupon" />
                     <div className="flex flex-col gap-2 items-start">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -1104,13 +1087,13 @@ const totalSavings = cartItems.reduce(
         />
       </div>
 
-      <div className="overflow-x-auto hide-scrollbar">
+      <div className=" sm:block hidden overflow-x-auto hide-scrollbar">
         <DeepCleaningServices />
       </div>
       <MobilePhotos galleryImages={galleryImages} />
 
       {apiService?.need_from_you?.length > 0 && (
-        <div className="max-w-7xl mx-auto mb-10 mt-10 sm:px-5 px-4 sm:hidden">
+        <div className="max-w-7xl mx-auto mb-10 mt-10 sm:px-5 px-2 sm:hidden">
           <h2 className="text-xl font-bold text-gray-900 mb-5">
             What we will need from you
           </h2>
@@ -1199,8 +1182,6 @@ const totalSavings = cartItems.reduce(
           if (selectedService) {
             handleAddService(selectedService);
           }
-
-          setShowModal(false);
         }}
       />
     </>
@@ -1317,9 +1298,6 @@ const ReviewsSection = ({ reviews, displayServices, apiService }: any) => {
                             />
                           ) : null}
                         </div>
-                        <p className="text-gray-600 text-sm text-left">
-                          {review.text}
-                        </p>
                       </div>
 
                       <div>
@@ -1335,6 +1313,9 @@ const ReviewsSection = ({ reviews, displayServices, apiService }: any) => {
                       <Star className="w-3 h-3 fill-white text-white" />
                     </div>
                   </div>
+                  <p className="text-gray-600 text-sm text-left">
+                    {review.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -1394,7 +1375,7 @@ const ReviewsSection = ({ reviews, displayServices, apiService }: any) => {
 const BrandsSection = ({ brands, brandsRef }: any) => {
   return (
     <div className="mx-auto relative w-full overflow-hidden sm:mt-10">
-      <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mb-5">
+      <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mb-5 ">
         We covered AC Brand
       </h2>
 
@@ -1508,7 +1489,7 @@ const MobilePhotos = ({ galleryImages }: any) => {
   if (!galleryImages.length) return null;
 
   return (
-    <div className="max-w-7xl mx-auto mt-6 sm:px-5 px-4 sm:hidden">
+    <div className="max-w-7xl mx-auto mt-6 sm:px-5 px-2 sm:hidden">
       <h2 className="text-xl font-bold text-gray-900 mb-5">Photos</h2>
 
       <div className="grid grid-cols-2 gap-5 items-start">

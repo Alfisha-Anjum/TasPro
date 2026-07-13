@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Camera, User, Mail, Phone, ArrowRight } from "lucide-react";
+import Swal from "sweetalert2";
 
 function CompleteProfilePageContent() {
   const router = useRouter();
@@ -31,15 +32,20 @@ function CompleteProfilePageContent() {
     }
   };
 
-  const handleSubmit = () => {
-    if (!firstName.trim()) {
-      alert("Please enter your first name");
-      return;
-    }
+const handleSubmit = async () => {
+  if (!firstName.trim()) {
+    await Swal.fire({
+      icon: "warning",
+      title: "First Name Required",
+      text: "Please enter your first name.",
+      confirmButtonColor: "#f97316",
+    });
+    return;
+  }
 
-    // Redirect to new profile step 1 page
-    router.push(`/complete-profile-step-1?phone=${phone}`);
-  };
+  // Redirect to new profile step 1 page
+  router.push(`/complete-profile-step-1?phone=${phone}`);
+};
 
   return (
     <div className="min-h-screen flex flex-col">

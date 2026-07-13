@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Mail, Shield, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Swal from "sweetalert2";
 
 function EmailVerificationPageContent() {
   const router = useRouter();
@@ -19,10 +20,15 @@ function EmailVerificationPageContent() {
   const [resendDisabled, setResendDisabled] = useState(false);
 
   const handleVerify = async () => {
-    if (!verificationCode) {
-      alert("Please enter the verification code");
-      return;
-    }
+  if (!verificationCode) {
+    await Swal.fire({
+      icon: "warning",
+      title: "Verification Code Required",
+      text: "Please enter the verification code.",
+      confirmButtonColor: "#f97316",
+    });
+    return;
+  }
 
     setIsLoading(true);
     
@@ -34,12 +40,22 @@ function EmailVerificationPageContent() {
       updateUserProfile({
         emailVerified: true
       });
-      
+      await Swal.fire({
+  icon: "success",
+  title: "Email Verified",
+  text: "Your email has been verified successfully.",
+  confirmButtonColor: "#f97316",
+});
       // Navigate to complete profile step 2
       router.push(`/complete-profile-step-2?phone=${phone}&firstName=${firstName}&lastName=${lastName}&email=${email}`);
     } catch (error) {
       console.error('Email verification failed:', error);
-      alert('Invalid verification code. Please try again.');
+await Swal.fire({
+  icon: "error",
+  title: "Verification Failed",
+  text: "Invalid verification code. Please try again.",
+  confirmButtonColor: "#f97316",
+});
     } finally {
       setIsLoading(false);
     }

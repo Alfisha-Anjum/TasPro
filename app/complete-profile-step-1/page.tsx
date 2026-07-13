@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Camera, User, Mail, Phone, Check, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const CompleteProfileStep1 = () => {
   return (
@@ -79,20 +80,29 @@ function CompleteProfileContent() {
   const handleContinue = async () => {
     if (!validateFields()) return;
 
-    if (!isVerified) {
-      alert("Please verify your details first");
-      return;
-    }
-
+  if (!isVerified) {
+    await Swal.fire({
+      icon: "warning",
+      title: "Verification Required",
+      text: "Please verify your details first.",
+      confirmButtonColor: "#f97316",
+    });
+    return;
+  }
     try {
       const token = localStorage.getItem("token");
       const customerId = localStorage.getItem("customer_id");
+if (!token) {
+  await Swal.fire({
+    icon: "warning",
+    title: "Authentication Required",
+    text: "User not authenticated. Please login again.",
+    confirmButtonColor: "#f97316",
+  });
 
-      if (!token) {
-        alert("User not authenticated. Please login again.");
-        router.push("/login");
-        return;
-      }
+  router.push("/login");
+  return;
+}
 
       const formData = new FormData();
 
@@ -162,7 +172,12 @@ function CompleteProfileContent() {
         return;
       }
 
-      alert(message || "Profile update failed");
+  await Swal.fire({
+    icon: "error",
+    title: "Profile Update Failed",
+    text: message || "Profile update failed.",
+    confirmButtonColor: "#f97316",
+  });
     }
     } catch (error: any) {
       console.error(error);
@@ -185,11 +200,23 @@ function CompleteProfileContent() {
           contactVerified: true,
         });
 
+        await Swal.fire({
+          icon: "success",
+          title: "Profile Updated",
+          text: "Your profile has been updated successfully.",
+          confirmButtonColor: "#f97316",
+        });
+        
         router.push("/");
         return;
       }
 
-      alert(message || "Something went wrong while updating profile");
+     await Swal.fire({
+       icon: "error",
+       title: "Error",
+       text: message || "Something went wrong while updating profile.",
+       confirmButtonColor: "#f97316",
+     });
     }
   };
 

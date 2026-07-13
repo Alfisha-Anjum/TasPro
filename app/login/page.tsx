@@ -6,6 +6,7 @@ import { Phone, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -35,35 +36,79 @@ const LoginPage = () => {
     fetchCountries();
   }, []);
 
-  const handleSendOTP = async () => {
-    if (phone.length !== 10) {
-      alert("Please enter a valid 10-digit phone number");
+const handleSendOTP = async () => {
+  if (phone.length !== 10) {
+    Swal.fire({
+      icon: "warning",
+      title: "Invalid Phone Number",
+      text: "Please enter a valid 10-digit phone number.",
+      confirmButtonColor: "#f97316",
+    });
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await axios.post(
+      "https://app.tasprocompany.in/api/customers/send-otp",
+      {
+        country_id: selectedCountry.id,
+        mobile: phone,
+      },
+    );
+
+    if (res.data.status) {
+      Swal.fire({
+        icon: "success",
+        title: "OTP Sent",
+        text: "OTP has been sent successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        router.push(`/otp?phone=${phone}`);
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: res.data.message || "Unable to send OTP.",
+        confirmButtonColor: "#f97316",
+      });
+    }
+  } catch (error: any) {
+    if (
+      error?.response?.status === 401 ||
+      error?.response?.data?.message === "Unauthenticated."
+    ) {
+      localStorage.removeItem("token");
+
+      Swal.fire({
+        icon: "warning",
+        title: "Session Expired",
+        text: "Please login again.",
+        confirmButtonColor: "#f97316",
+      }).then(() => {
+        router.push("/login");
+      });
+
       return;
     }
 
-    try {
-      setLoading(true);
+    console.error(error?.response?.data || error);
 
-      const res = await axios.post(
-        "https://app.tasprocompany.in/api/customers/send-otp",
-        {
-          country_id: selectedCountry.id,
-          mobile: phone,
-        },
-      );
-
-      if (res.data.status) {
-        router.push(`/otp?phone=${phone}`);
-      } else {
-        alert(res.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    Swal.fire({
+      icon: "error",
+      title: "Oops!",
+      text:
+        error?.response?.data?.message ||
+        "Something went wrong. Please try again.",
+      confirmButtonColor: "#f97316",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="md:min-h-screen flex flex-col">

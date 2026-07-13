@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Shield } from "lucide-react";
 import OTPVerification from "@/components/OTPVerification";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
+import Swal from "sweetalert2";
 function OTPVerificationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -15,18 +16,18 @@ function OTPVerificationPageContent() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleVerify = async (otp: string) => {
-    setIsLoading(true);
+ const handleVerify = async (otp: string) => {
+   setIsLoading(true);
 
-    try {
-      const res = await axios.post(
-        "https://app.tasprocompany.in/api/customers/verify-otp",
-        {
-          country_id: 1, // or dynamic if needed
-          mobile: phone,
-          otp: Number(otp),
-        },
-      );
+   try {
+     const res = await axios.post(
+       "https://app.tasprocompany.in/api/customers/verify-otp",
+       {
+         country_id: 1,
+         mobile: phone,
+         otp: Number(otp),
+       },
+     );
 
      if (res.data.status) {
        const token = res.data.token;
@@ -35,7 +36,15 @@ function OTPVerificationPageContent() {
        localStorage.setItem("token", token);
        localStorage.setItem("customer_id", String(user.id));
 
-       // ✅ profile already completed
+       await Swal.fire({
+         icon: "success",
+         title: "OTP Verified",
+         text: "Login successful.",
+         timer: 1500,
+         showConfirmButton: false,
+       });
+
+       // Profile already completed
        if (user?.first_name && user.first_name.trim() !== "") {
          login({
            phone: user.mobile,
@@ -52,24 +61,59 @@ function OTPVerificationPageContent() {
          return;
        }
 
-       // ❌ profile not completed
+       // Profile not completed
        router.push(`/complete-profile-step-1?phone=${user.mobile}`);
      } else {
-       alert(res.data.message || "OTP verification failed");
+       Swal.fire({
+         icon: "error",
+         title: "Verification Failed",
+         text: res.data.message || "OTP verification failed.",
+         confirmButtonColor: "#f97316",
+       });
      }
-    } catch (error) {
-      console.error("OTP verification failed:", error);
-      alert("Invalid OTP. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+   } catch (error: any) {
+     console.error("OTP verification failed:", error);
 
-  const handleResend = async () => {
-    // Simulate resending OTP
-    console.log(`Resending OTP to ${phone}`);
-    // In a real app, you would call an API to resend OTP
-  };
+     if (
+       error?.response?.status === 401 ||
+       error?.response?.data?.message === "Unauthenticated."
+     ) {
+       localStorage.removeItem("token");
+
+       await Swal.fire({
+         icon: "warning",
+         title: "Session Expired",
+         text: "Please login again.",
+         confirmButtonColor: "#f97316",
+       });
+
+       router.push("/login");
+       return;
+     }
+
+     Swal.fire({
+       icon: "error",
+       title: "Invalid OTP",
+       text:
+         error?.response?.data?.message ||
+         "The OTP you entered is incorrect. Please try again.",
+       confirmButtonColor: "#f97316",
+     });
+   } finally {
+     setIsLoading(false);
+   }
+ };
+
+ const handleResend = async () => {
+   console.log(`Resending OTP to ${phone}`);
+
+   await Swal.fire({
+     icon: "success",
+     title: "OTP Sent",
+     text: "A new OTP has been sent to your mobile number.",
+     confirmButtonColor: "#f97316",
+   });
+ };
 
   const handleBack = () => {
     router.back();

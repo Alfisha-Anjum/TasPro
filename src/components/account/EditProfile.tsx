@@ -6,6 +6,7 @@ import { useState } from "react";
 import axios from "axios";
 import GradientButton2 from "@/components/ui/GradientButton2";
 import { useAuth } from "@/context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function EditProfile({
   setActiveView,
@@ -93,18 +94,33 @@ export default function EditProfile({
           contactVerified: true,
         });
 
-        setActiveView("default");
+      await Swal.fire({
+        icon: "success",
+        title: "Profile Updated!",
+        text: "Your profile has been updated successfully.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      setActiveView("default");
       } else {
-        alert(res.data.message || "Profile update failed");
+       await Swal.fire({
+         icon: "error",
+         title: "Update Failed",
+         text: res.data.message || "Profile update failed",
+       });
       }
     } catch (error: any) {
       console.log("Update profile error:", error?.response?.data || error);
 
-      alert(
-        error?.response?.data?.message ||
-          error?.response?.data?.error ||
-          "Something went wrong",
-      );
+     await Swal.fire({
+       icon: "error",
+       title: "Oops!",
+       text:
+         error?.response?.data?.message ||
+         error?.response?.data?.error ||
+         "Something went wrong",
+     });
     }
   };
 

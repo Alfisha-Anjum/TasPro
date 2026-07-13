@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import {
   Home,
@@ -16,7 +16,7 @@ import {
   IndianRupee,
   Filter,
   Search,
-  Info,
+  
   X,
   ArrowLeft,
   UserRound,
@@ -24,9 +24,11 @@ import {
   Wrench,
   House,
   PlusCircle,
+ 
 } from "lucide-react";
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { CalendarClock } from "lucide-react";
 // import SelectAddressModal from "@/components/SelectAddressModal";
 import BookingDetailsModal from "@/components/BookingDetailsModal";
 import RescheduleModal from "@/components/RescheduleModal";
@@ -48,12 +50,37 @@ import Breadcrumb from "@/components/account/Breadcrumb";
 import { usePathname, useSearchParams } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Swal from "sweetalert2";
+import {
+  AssignmentTurnedIn,
+  SupportAgent,
+  PersonAdd,
+  Verified,
+} from "@mui/icons-material";
+
+import {
+  Info,
+  Clock3,
+  XCircle,
+  Download,
+} from "lucide-react";
+
+
+const iconMap: Record<string, JSX.Element> = {
+  "assignment-turned-in": <AssignmentTurnedIn fontSize="small" />,
+  "support-agent": <SupportAgent fontSize="small" />,
+  "person-add": <PersonAdd fontSize="small" />,
+  verified: <Verified fontSize="small" />,
+  "event-repeat": <CalendarClock fontSize="small" />,
+};
 // import { AddNewAddressModal } from "@/components/booking-flow/AddNewAddressModal";
 
 const MyBookingContent = () => {
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+const [showMenu, setShowMenu] = useState(false);
+
   // const activeTabs = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<
     "pending" | "rejected" | "completed"
@@ -107,8 +134,20 @@ const MyBookingContent = () => {
   const trackingInfo = bookingDetails?.tracking_info;
 
   const [customerAddress, setCustomerAddress] = useState<any>(null);
+const trackingSteps = bookingDetails?.tracking_info?.tracking_steps || [];
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
  
   const currentStep =
     trackingInfo?.tracking_steps?.find(
@@ -311,35 +350,73 @@ console.log("Updated Address:", customerAddress);
     return response.data;
   };
 
-  const handleReschedule = async (data: {
-    slot_id: number;
-    date: string;
-    customer_notes: string;
-  }) => {
-    if (!selectedBooking) return;
+const handleReschedule = async (data: {
+  slot_id: number;
+  date: string;
+  customer_notes: string;
+}) => {
+  if (!selectedBooking) return;
 
-    try {
-      const result = await rescheduleBooking({
-        booking_id: selectedBooking.booking_id || selectedBooking.id,
-        slot_id: data.slot_id,
-        date: data.date,
-        customer_notes: data.customer_notes,
+  try {
+    const result = await rescheduleBooking({
+      booking_id: selectedBooking.booking_id || selectedBooking.id,
+      slot_id: data.slot_id,
+      date: data.date,
+      customer_notes: data.customer_notes,
+    });
+
+    if (result.status) {
+      await Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: result.message || "Booking rescheduled successfully.",
+        confirmButtonColor: "#f97316",
       });
 
-      if (result.status) {
-        alert(result.message);
+      setShowRescheduleModal(false);
 
-        setShowRescheduleModal(false);
+      await fetchBookings();
 
-        await fetchBookings();
-
-        // if you have booking details api
-        // await fetchBookingDetails(selectedBooking.id);
-      }
-    } catch (error: any) {
-      console.log("API ERROR", error?.response?.data);
+      // if you have booking details api
+      // await fetchBookingDetails(selectedBooking.id);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: result.message || "Unable to reschedule booking.",
+        confirmButtonColor: "#f97316",
+      });
     }
-  };
+  } catch (error: any) {
+    console.log("API ERROR", error?.response?.data);
+
+    if (
+      error?.response?.status === 401 ||
+      error?.response?.data?.message === "Unauthenticated."
+    ) {
+      localStorage.removeItem("token");
+
+      await Swal.fire({
+        icon: "warning",
+        title: "Session Expired",
+        text: "Please login again.",
+        confirmButtonColor: "#f97316",
+      });
+
+      router.push("/login");
+      return;
+    }
+
+    Swal.fire({
+      icon: "error",
+      title: "Oops!",
+      text:
+        error?.response?.data?.message ||
+        "Something went wrong while rescheduling your booking.",
+      confirmButtonColor: "#f97316",
+    });
+  }
+};
 
   // import axios from "axios";
 const handleTrackDetails = async (bookingId: number) => {
@@ -369,6 +446,20 @@ const handleTrackDetails = async (bookingId: number) => {
     console.log(err.response?.data || err.message);
   }
 };
+
+// const trackingSteps = bookingDetails?.tracking_info?.tracking_steps || [];
+
+const currentIndex = trackingSteps.findIndex(
+  (step: any) => step.status === "in_progress",
+);
+
+const timeline = trackingSteps.map((step: any, index: number) => ({
+  ...step,
+  completed: step.status === "completed",
+  current: step.status === "in_progress",
+  pending: step.status === "pending",
+}));
+
   const [amcBookings, setAmcBookings] = useState([
     {
       id: "AMC-001",
@@ -702,10 +793,11 @@ const handleTrackDetails = async (bookingId: number) => {
         </div> */}
         <Breadcrumb
           items={[
-            { label: "Home", href: "/my-booking" },
-            { label: "My Booking" },
+            { label: "Home", href: "/" },
+            { label: "My Booking", href: "/my-booking" },
           ]}
         />
+
         <div className="flex flex-col md:flex-row gap-5 md:gap-10 w-full mx-auto">
           {/* Sidebar */}
           {/* <div
@@ -745,18 +837,90 @@ const handleTrackDetails = async (bookingId: number) => {
             </div>
           </div> */}
           <AccountSidebar />
-          <div className="relative w-full flex items-center justify-center md:hidden">
-            {/* Back Button */}
+          <div
+            className={`relative w-full flex items-center md:hidden ${
+              showBookingDetailsPage && selectedBooking
+                ? "justify-between"
+                : "justify-center"
+            }`}
+          >
             <button
-              onClick={() => router.push("/my-booking?tab=home")}
-              className="absolute left-0 text-black dark:text-white hover:text-orange-500 transition"
+              onClick={() => router.push("/my-booking")}
+              className={`text-black dark:text-white hover:text-orange-500 transition ${
+                showBookingDetailsPage && selectedBooking
+                  ? ""
+                  : "absolute left-0"
+              }`}
             >
               <ArrowLeft size={20} />
             </button>
 
             {/* Center Title */}
             <p className="text-center font-medium">My Bookings</p>
+            {showBookingDetailsPage && selectedBooking && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="rounded-full p-1"
+                >
+                  <Info className="w-5 h-5 text-black" />
+                </button>
+
+                {showMenu && (
+                  <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                    {/* Reschedule */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        setShowRescheduleModal(true);
+                        setShowMenu(false);
+                      }}
+                      className="flex items-center gap-2 w-full px-5 py-3 hover:bg-gray-50 transition"
+                    >
+                      <Clock3 className="w-5 h-5 text-black" />
+                      <span className="text-[12px] font-medium">
+                        Reschedule
+                      </span>
+                    </button>
+
+                    <hr />
+
+                    {/* Cancel */}
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowCancelModal(true);
+                      }}
+                      className="flex items-center gap-2 w-full px-5 py-3 hover:bg-gray-50 transition"
+                    >
+                      <XCircle className="w-5 h-5 text-red-500 fill-red-500" />
+                      <span className="text-[12px] font-medium text-red-500">
+                        Cancel Booking
+                      </span>
+                    </button>
+
+                    <hr />
+
+                    {/* Download */}
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        handleDownloadInvoice();
+                      }}
+                      className="flex items-center gap-2 w-full px-5 py-3 hover:bg-gray-50 transition"
+                    >
+                      <Download className="w-5 h-5 text-blue-500" />
+                      <span className="text-[12px] font-medium">
+                        Download Invoice
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
           {/* Main Content */}
           {showChatBot ? (
             <div className="flex-1 flex justify-center items-start  ">
@@ -1057,7 +1221,7 @@ const handleTrackDetails = async (bookingId: number) => {
               </button> */}
 
                   <div className="flex flex-col lg:flex-row w-full max-w-[1100px] gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 mx-auto">
-                    <div className="space-y-6 w-full lg:max-w-sm min-w-0">
+                    <div className="sm:space-y-6 w-full lg:max-w-sm min-w-0">
                       {/* SERVICE CARD */}
                       {/* <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border flex flex-row gap-3 sm:gap-4 items-start">
                         <img
@@ -1110,6 +1274,8 @@ const handleTrackDetails = async (bookingId: number) => {
                       {/* SERVICE CARD */}
                       <div className="bg-white rounded-2xl shadow-sm border p-4">
                         {/* Mobile Layout */}
+                        {/* Mobile Only */}
+
                         <div className="block sm:hidden">
                           <div className="flex justify-between items-start py-4">
                             <h2 className="font-semibold text-[15px] text-gray-900">
@@ -1178,9 +1344,6 @@ const handleTrackDetails = async (bookingId: number) => {
                               )}
                             </div>
 
-
-                            
-
                             <div className="flex gap-3 p-2">
                               <img
                                 src={
@@ -1201,8 +1364,8 @@ const handleTrackDetails = async (bookingId: number) => {
                           </div>
                         </div>
                       </div>
-                      <div className="bg-white border rounded-xl shadow-sm">
-                        <div className="block sm:hidden p-4">
+                      <div className="bg-white border rounded-xl shadow-sm mt-4">
+                        <div className="block sm:hidden p-4 ">
                           <div className="flex justify-between items-center">
                             <div>
                               <span
@@ -1269,8 +1432,8 @@ const handleTrackDetails = async (bookingId: number) => {
                         </div>
                       </div>
                       {showTracking && (
-                        <div className="fixed inset-0 z-50 flex items-end bg-black/40">
-                          <div className="w-full bg-white rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto animate-slide-up">
+                        <div className="fixed inset-0 bottom-0 my-20 z-50 flex items-end bg-black/40">
+                          <div className="w-full bg-white rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto animate-slide-up ">
                             {/* Header */}
                             <div className="flex items-center gap-3 mb-6">
                               <button onClick={() => setShowTracking(false)}>
@@ -1283,50 +1446,108 @@ const handleTrackDetails = async (bookingId: number) => {
                             </div>
 
                             {/* Timeline */}
-                            <div className="space-y-6">
-                              {trackingData.map((item, index) => (
-                                <div key={index} className="flex gap-4">
-                                  {/* Left Line */}
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-5 h-5 rounded-full border-2 ${
-                                        item.completed
-                                          ? "bg-green-500 border-green-500"
-                                          : "border-gray-300"
-                                      }`}
-                                    />
+                            <div className="space-y-7">
+                              {trackingSteps.map((item: any, index: number) => {
+                                const completed = item.status === "completed";
+                                const active = item.status === "in_progress";
+                                const pending = item.status === "pending";
 
-                                    {index !== trackingData.length - 1 && (
+                                return (
+                                  <div key={item.id} className="flex gap-4">
+                                    {/* LEFT SIDE */}
+                                    <div className="flex flex-col items-center">
                                       <div
-                                        className={`w-1 h-24 ${
-                                          item.completed
-                                            ? "bg-green-500"
-                                            : "bg-gray-300"
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center z-10
+            ${
+              completed
+                ? "bg-green-500 text-white"
+                : active
+                  ? "bg-green-100 border-2 border-green-500"
+                  : "border-2 border-gray-300 bg-white text-gray-400"
+            }`}
+                                      >
+                                        {completed ? (
+                                          <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth={3}
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path d="M5 13l4 4L19 7" />
+                                          </svg>
+                                        ) : active ? (
+                                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                                        ) : null}
+                                      </div>
+
+                                      {index !== trackingSteps.length - 1 && (
+                                        <div
+                                          className={`w-[3px] h-28 ${
+                                            completed || active
+                                              ? "bg-green-500"
+                                              : "bg-gray-300"
+                                          }`}
+                                        />
+                                      )}
+                                    </div>
+
+                                    {/* CARD */}
+                                    <div
+                                      className={`flex-1 h-28 rounded-3xl p-5 shadow-md transition-all
+          ${
+            active
+              ? "bg-green-50 border-2 border-green-500"
+              : "bg-white border border-gray-200"
+          }`}
+                                    >
+                                      <div className="flex gap-4">
+                                        <div
+                                          className={`w-10 h-10 rounded-2xl flex items-center justify-center
+              ${
+                completed || active
+                  ? "bg-green-100 text-green-600"
+                  : "bg-gray-100 text-gray-400"
+              }`}
+                                        >
+                                          {iconMap[item.icon]}
+                                        </div>
+
+                                        <div>
+                                          <h3
+                                            className={`font-bold text-sm ${
+                                              pending
+                                                ? "text-gray-400"
+                                                : "text-black"
+                                            }`}
+                                          >
+                                            {item.title}
+                                          </h3>
+
+                                          <p
+                                            className={`text-sm ${
+                                              pending
+                                                ? "text-gray-400"
+                                                : "text-gray-500"
+                                            }`}
+                                          >
+                                            {item.time || "In a while"}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <p
+                                        className={`mt-2 text-xs ${
+                                          pending
+                                            ? "text-gray-400"
+                                            : "text-gray-600"
                                         }`}
-                                      />
-                                    )}
+                                      >
+                                        {item.desc}
+                                      </p>
+                                    </div>
                                   </div>
-
-                                  {/* Card */}
-                                  <div
-                                    className={`flex-1 rounded-2xl shadow border p-4 ${
-                                      item.active
-                                        ? "border-green-500 bg-green-50"
-                                        : "border-gray-200"
-                                    }`}
-                                  >
-                                    <h3 className="font-bold">{item.title}</h3>
-
-                                    <p className="text-sm text-gray-500">
-                                      {item.date}
-                                    </p>
-
-                                    <p className="text-gray-600 mt-2">
-                                      {item.description}
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         </div>
@@ -1373,7 +1594,7 @@ const handleTrackDetails = async (bookingId: number) => {
                       )}
 
                       {/* CUSTOMER DETAILS */}
-                      <div className="bg-white rounded-xl p-5 shadow-sm border relative">
+                      <div className="bg-white rounded-xl p-5 shadow-sm border relative mt-4">
                         <div className="flex items-start justify-between mb-3">
                           <h3 className="font-semibold text-[clamp(14px,1.5vw,18px)]">
                             Customer Details
@@ -1528,7 +1749,7 @@ const handleTrackDetails = async (bookingId: number) => {
                         </button>
                       </div>
 
-                      <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border mt-4">
+                      <div className="sm:block hidden bg-white rounded-xl p-4 sm:p-5 shadow-sm border mt-4">
                         <h2 className="text-[clamp(14px,1.5vw,18px)] font-semibold text-gray-900">
                           GST Details
                         </h2>
@@ -1592,7 +1813,7 @@ const handleTrackDetails = async (bookingId: number) => {
                         {/* BUTTONS */}
                         <button
                           onClick={() => setShowRescheduleModal(true)}
-                          className="block w-full mt-5 border border-orange-500 text-orange-500 py-2 rounded-full"
+                          className="hidden md:block w-full mt-5 border border-orange-500 text-orange-500 py-2 rounded-full"
                         >
                           Reschedule
                         </button>
@@ -1601,13 +1822,13 @@ const handleTrackDetails = async (bookingId: number) => {
                           onClick={() => {
                             setShowCancelModal(true);
                           }}
-                          className="block w-full mt-3 bg-orange-500 text-white py-3 rounded-full shadow-md"
+                          className="hidden md:block w-full mt-3 bg-orange-500 text-white py-3 rounded-full shadow-md"
                         >
                           Cancel Booking
                         </button>
                       </div>
 
-                      <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border">
+                      <div className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-sm border mt-4">
                         <h3 className="text-[clamp(14px,1.5vw,18px)] font-semibold">
                           Payment Method
                         </h3>
@@ -1616,7 +1837,7 @@ const handleTrackDetails = async (bookingId: number) => {
                         </p>
                       </div>
 
-                      <div className="bg-white rounded-xl font-bold p-4 sm:p-5 md:p-6 shadow-sm border">
+                      <div className="sm:block hidden bg-white rounded-xl font-bold p-4 sm:p-5 md:p-6 shadow-sm border">
                         {/* Heading */}
                         <h3 className="font-semibold text-[clamp(14px,1.5vw,18px)] text-gray-800 mb-4">
                           Service Provider
@@ -1666,9 +1887,9 @@ const handleTrackDetails = async (bookingId: number) => {
 
                     {/* RIGHT SECTION */}
 
-                    <div className="shadow-sm h-fit w-full lg:flex-1 min-w-0 lg:sticky lg:top-24 sm:px-0 gap-5">
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className=" shadow-sm h-fit w-full lg:flex-1 min-w-0 lg:sticky lg:top-24 sm:px-0 gap-5">
+                      <div className=" sm:block hidden mb-4">
+                        <div className=" flex items-center justify-between mb-4">
                           <h3 className="font-semibold text-[clamp(14px,1.5vw,18px)] text-gray-800 dark:text-gray-200 text-lg">
                             Advance Payment Summary
                           </h3>

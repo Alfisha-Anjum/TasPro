@@ -3,20 +3,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Phone, ArrowRight } from "lucide-react";
+import Swal from "sweetalert2";
 
 const SignupPage = () => {
   const router = useRouter();
   const [phone, setPhone] = useState("");
 
-  const handleSendOTP = () => {
-    // Validate phone number
-    if (phone.length === 10) {
-      // Navigate to OTP verification page with signup flag
-      router.push(`/otp?phone=${phone}&signup=true`);
-    } else {
-      alert("Please enter a valid 10-digit phone number");
-    }
-  };
+ const handleSendOTP = async () => {
+   if (phone.length === 10) {
+     await Swal.fire({
+       icon: "success",
+       title: "OTP Sent!",
+       text: "Your OTP has been sent successfully.",
+       timer: 1500,
+       showConfirmButton: false,
+     });
+
+     router.push(`/otp?phone=${phone}&signup=true`);
+   } else {
+     Swal.fire({
+       icon: "warning",
+       title: "Invalid Phone Number",
+       text: "Please enter a valid 10-digit phone number.",
+       confirmButtonColor: "#f97316",
+     });
+   }
+ };
 
   return (
     <div className="md:min-h-screen bg-white flex flex-col">
