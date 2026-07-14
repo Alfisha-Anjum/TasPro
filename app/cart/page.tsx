@@ -181,8 +181,8 @@ export default function CartPage() {
     return res.data;
   };
 
- const createCustomerCart = async () => {
-   const token = localStorage.getItem("token");
+const createCustomerCart = async () => {
+  const token = localStorage.getItem("token");
 
   if (!token) {
     await Swal.fire({
@@ -196,52 +196,60 @@ export default function CartPage() {
     return;
   }
 
- if (!cartItems.length) {
-   await Swal.fire({
-     icon: "warning",
-     title: "Cart Empty",
-     text: "Please add at least one service to continue.",
-     confirmButtonColor: "#f97316",
-   });
+  if (!cartItems.length) {
+    await Swal.fire({
+      icon: "warning",
+      title: "Cart Empty",
+      text: "Please add at least one service to continue.",
+      confirmButtonColor: "#f97316",
+    });
 
-   return;
- }
+    return;
+  }
 
-   try {
-     setCartLoading(true);
+  try {
+    setCartLoading(true);
 
-     const payload = {
-       service_category_id: Number(
-         cartItems[0]?.service_category_id ||
-           cartItems[0]?.serviceCategoryId ||
-           1,
-       ),
-       service_id: Number(
-         cartItems[0]?.service_id || cartItems[0]?.serviceId || 1,
-       ),
-       carts: cartItems.map((item: any) => ({
-         service_sub_category_id: Number(
-           item.service_sub_category_id ||
-             item.serviceSubCategoryId ||
-             item.sub_category_id ||
-             1,
-         ),
-         service_issue_id: Number(item.service_issue_id || item.id),
-         quantity: Number(item.quantity || 1),
-       })),
-     };
+    const payload = {
+      service_category_id: Number(
+        cartItems[0]?.service_category_id ||
+          cartItems[0]?.serviceCategoryId ||
+          1,
+      ),
+      service_id: Number(
+        cartItems[0]?.service_id || cartItems[0]?.serviceId || 1,
+      ),
+      carts: cartItems.map((item: any) => ({
+        service_sub_category_id: Number(
+          item.service_sub_category_id ||
+            item.serviceSubCategoryId ||
+            item.sub_category_id ||
+            1,
+        ),
+        service_issue_id: Number(item.service_issue_id || item.id),
+        quantity: Number(item.quantity || 1),
+      })),
+    };
 
-     const res = await axios.post(
-       "https://app.tasprocompany.in/api/customers/customer-carts?state_id=1&city_id=1&state_name=Chhattisgarh&city_name=Raipur",
-       payload,
-       {
-         headers: {
-           Authorization: `Bearer ${token}`,
-           Accept: "application/json",
-           "Content-Type": "application/json",
-         },
-       },
-     );
+    const res = await axios.post(
+      "https://app.tasprocompany.in/api/customers/customer-carts?state_id=1&city_id=1&state_name=Chhattisgarh&city_name=Raipur",
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    console.log("Cart Created:", res.data);
+
+    // Continue your success flow here
+    // Example:
+    // router.push("/booking-payment");
+  } catch (error: any) {
+    console.log("CART API ERROR:", error?.response?.data || error);
 
     if (
       error?.response?.status === 401 ||
@@ -259,22 +267,18 @@ export default function CartPage() {
       return;
     }
 
-    //  console.log("CART API ERROR:", error?.response?.data || error);
-
-    //  Swal.fire({
-    //    icon: "error",
-    //    title: "Failed",
-    //    text:
-    //      error?.response?.data?.message ||
-    //      "Unable to create cart. Please try again.",
-    //    confirmButtonColor: "#f97316",
-    //  });
-
-   } finally {
-     setCartLoading(false);
-   }
- };
-
+    await Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text:
+        error?.response?.data?.message ||
+        "Unable to create cart. Please try again.",
+      confirmButtonColor: "#f97316",
+    });
+  } finally {
+    setCartLoading(false);
+  }
+};
 const handleAddItem = (item: any) => {
   addToCart(item);
 };
