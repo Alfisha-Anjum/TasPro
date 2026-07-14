@@ -11,7 +11,7 @@ import AddNewAddressModal from "@/components/AddNewAddressModal";
 import DeepCleaningServices from "@/components/DeepCleaningServices";
 import axios from "axios";
 import Image from "next/image";
-
+import Swal from "sweetalert2";
 
 const frequentlyAdded = [
   {
@@ -49,6 +49,7 @@ export default function CartPage() {
 
   const {
     cartItems,
+    
     addToCart,
     removeFromCart,
     selectedAddress,
@@ -183,16 +184,28 @@ export default function CartPage() {
  const createCustomerCart = async () => {
    const token = localStorage.getItem("token");
 
-   if (!token) {
-     alert("Please login to continue booking.");
-     router.push("/login");
-     return;
-   }
+  if (!token) {
+    await Swal.fire({
+      icon: "warning",
+      title: "Login Required",
+      text: "Please login to continue booking.",
+      confirmButtonColor: "#f97316",
+    });
 
-   if (!cartItems.length) {
-     alert("Cart is empty");
-     return;
-   }
+    router.push("/login");
+    return;
+  }
+
+ if (!cartItems.length) {
+   await Swal.fire({
+     icon: "warning",
+     title: "Cart Empty",
+     text: "Please add at least one service to continue.",
+     confirmButtonColor: "#f97316",
+   });
+
+   return;
+ }
 
    try {
      setCartLoading(true);
@@ -230,30 +243,41 @@ export default function CartPage() {
        },
      );
 
-     if (res.data?.status) {
-       setShowDateTimeModal(true);
-     }
-   } catch (error: any) {
-     // Handle expired/invalid token
-     if (
-       error?.response?.status === 401 ||
-       error?.response?.data?.message === "Unauthenticated."
-     ) {
-       alert("Session expired. Please login again.");
-       localStorage.removeItem("token");
-       router.push("/login");
-       return;
-     }
+    if (
+      error?.response?.status === 401 ||
+      error?.response?.data?.message === "Unauthenticated."
+    ) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Session Expired",
+        text: "Please login again.",
+        confirmButtonColor: "#f97316",
+      });
 
-     console.log("CART API ERROR:", error?.response?.data || error);
+      localStorage.removeItem("token");
+      router.push("/login");
+      return;
+    }
+
+    //  console.log("CART API ERROR:", error?.response?.data || error);
+
+    //  Swal.fire({
+    //    icon: "error",
+    //    title: "Failed",
+    //    text:
+    //      error?.response?.data?.message ||
+    //      "Unable to create cart. Please try again.",
+    //    confirmButtonColor: "#f97316",
+    //  });
+
    } finally {
      setCartLoading(false);
    }
  };
 
-  const handleAddItem = (item: any) => {
-    setCartItems((prev) => [...prev, item]);
-  };
+const handleAddItem = (item: any) => {
+  addToCart(item);
+};
 
 const handleDateTimeContinue = (
   date: string,
@@ -742,7 +766,7 @@ const handleDateTimeContinue = (
                 {/* Content */}
                 <div className="p-2 md:p-4">
                   <p className="text-[10px] md:text-base font-medium line-clamp-2">
-                    {item.title || item.name}
+                    {item.title || "Service Name"}
                   </p>
 
                   <div className="mt-1 md:mt-3">

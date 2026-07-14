@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { useState } from "react";
-
+import Swal from "sweetalert2";
 interface AddNewAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,43 +53,54 @@ const [formData, setFormData] = useState({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    if (
-      !formData.fullName ||
-      !formData.contactNumber ||
-      !formData.postalCode ||
-      !formData.state ||
-      !formData.city ||
-      !formData.houseNo ||
-      !formData.location
-    ) {
-      alert("Please fill all required fields");
-      return;
-    }
-    onSave(formData);
-    // Reset form
-  setFormData({
-    fullName: "",
-    contactNumber: "",
-    alternateNumber: "",
-    postalCode: "",
-    state: "",
-    city: "",
-    houseNo: "",
-    location: "",
-    roadLandmark: "",
-    latitude: 0,
-    longitude: 0,
-    state_name: "",
-    city_name: "",
-  });
-  };
+ const handleSave = async () => {
+   if (
+     !formData.fullName ||
+     !formData.contactNumber ||
+     !formData.postalCode ||
+     !formData.state ||
+     !formData.city ||
+     !formData.houseNo ||
+     !formData.location
+   ) {
+     await Swal.fire({
+       icon: "warning",
+       title: "Required Fields",
+       text: "Please fill all required fields.",
+       confirmButtonColor: "#f97316",
+     });
+     return;
+     return;
+   }
+   onSave(formData);
+   // Reset form
+   setFormData({
+     fullName: "",
+     contactNumber: "",
+     alternateNumber: "",
+     postalCode: "",
+     state: "",
+     city: "",
+     houseNo: "",
+     location: "",
+     roadLandmark: "",
+     latitude: 0,
+     longitude: 0,
+     state_name: "",
+     city_name: "",
+   });
+ };
 
   if (!isOpen) return null;
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Location is not supported");
+    Swal.fire({
+      icon: "error",
+      title: "Location Not Supported",
+      text: "Your browser does not support geolocation.",
+      confirmButtonColor: "#f97316",
+    });
       return;
     }
 
@@ -99,12 +110,24 @@ const [formData, setFormData] = useState({
         const longitude = position.coords.longitude;
 
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY;
-
+// console.log("API Key:", process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY);
         const res = await fetch(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
         );
 
-        const data = await res.json();
+      const data = await res.json();
+
+      console.log("Geocoding Response:", data);
+
+      if (data.status !== "OK") {
+       Swal.fire({
+         icon: "error",
+         title: "Location Error",
+         text: data.error_message || data.status,
+         confirmButtonColor: "#f97316",
+       });
+        return;
+      }
         const result = data?.results?.[0];
 
         let city = "";
@@ -150,7 +173,12 @@ const [formData, setFormData] = useState({
         window.dispatchEvent(new Event("location-updated"));
       },
       () => {
-        alert("Please allow location permission");
+       Swal.fire({
+         icon: "warning",
+         title: "Permission Required",
+         text: "Please allow location permission to fetch your current address.",
+         confirmButtonColor: "#f97316",
+       });
       },
     );
   };

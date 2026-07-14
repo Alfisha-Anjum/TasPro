@@ -9,6 +9,7 @@ import { useBooking } from "@/context/BookingContext";
 import { OTPVerificationModal } from "@/components/OTPVerificationModal";
 import { CreditCard, Smartphone, Banknote, Lock, Wallet, ArrowLeft } from "lucide-react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -90,12 +91,29 @@ const createBooking = async (paymentMethod: string) => {
   localStorage.removeItem("bookingDateTime");
   localStorage.removeItem("selectedAddress");
 
-  alert("Booking Created Successfully!");
+  // alert("Booking Created Successfully!");
+  // router.push("/order-confirmation");
+  await Swal.fire({
+    icon: "success",
+    title: "Success!",
+    text: "Booking Created Successfully!",
+    confirmButtonColor: "#f97316",
+    confirmButtonText: "OK",
+  });
+
   router.push("/order-confirmation");
 }
   } catch (error: any) {
     console.log("BOOKING API ERROR:", error?.response?.data || error);
-    alert("Booking failed");
+    // alert("Booking failed");
+    Swal.fire({
+      icon: "error",
+      title: "Booking Failed",
+      text:
+        error?.response?.data?.message ||
+        "Something went wrong. Please try again.",
+      confirmButtonColor: "#f97316",
+    });
   }
 };
 
@@ -104,18 +122,17 @@ const handleRazorpayPayment = async () => {
     const token = localStorage.getItem("token");
 
     // 1. Create order
-  const res = await axios.post(
-    "https://app.tasprocompany.in/api/customers/customer-bookings",
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    const res = await axios.post(
+      "https://app.tasprocompany.in/api/customers/customer-bookings",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  console.log(res.data);
+    console.log(res.data);
 
     const order = res.data.data;
 
@@ -144,9 +161,17 @@ const handleRazorpayPayment = async () => {
 
     const razorpay = new (window as any).Razorpay(options);
     razorpay.open();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    alert("Razorpay Payment Failed");
+
+    Swal.fire({
+      icon: "error",
+      title: "Payment Failed",
+      text:
+        error?.response?.data?.message ||
+        "Razorpay payment failed. Please try again.",
+      confirmButtonColor: "#f97316",
+    });
   }
 };
 
@@ -155,17 +180,28 @@ const handlePayNow = (paymentMethod?: string) => {
 
   console.log("SELECTED METHOD:", method);
 
-  if (!method) {
-    alert("Please select payment method");
-    return;
-  }
+ if (!method) {
+   Swal.fire({
+     icon: "warning",
+     title: "Payment Method Required",
+     text: "Please select a payment method.",
+     confirmButtonColor: "#f97316",
+   });
+   return;
+ }
 
   createBooking(method);
 };
-  const handleOTPVerify = (otp: string) => {
-    alert("Payment successful! Booking confirmed.");
-    router.push("/booking-confirmation");
-  };
+ const handleOTPVerify = async (otp: string) => {
+   await Swal.fire({
+     icon: "success",
+     title: "Payment Successful",
+     text: "Your booking has been confirmed.",
+     confirmButtonColor: "#f97316",
+   });
+
+   router.push("/booking-confirmation");
+ };
 
   const totalMRP = cartItems.reduce(
     (sum: number, item: any) =>

@@ -51,3 +51,6 @@ node_modules
 .env
 dist
 build
+*.zip
+.env.local
+src/components/env.local

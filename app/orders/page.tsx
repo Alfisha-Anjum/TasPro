@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Package, Calendar, MapPin, Clock, Star, IndianRupee } from "lucide-react";
-
+import Swal from "sweetalert2";
 const OrdersPage = () => {
   const { user } = useAuth();
   

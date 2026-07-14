@@ -146,7 +146,7 @@ const handleCitySelect = (city: any) => {
 
   return (
     <header className="sticky top-0 z-20 bg-[#fafafa] border-b border-gray-200">
-      <div className="w-full xl:w-[90%] mx-auto px-4 sm:px-5">
+      <div className="w-full 2xl:w-[85%] mx-auto px-4 sm:px-5">
         {/* MOBILE HEADER */}
         <div className="md:hidden py-4">
           <div className="flex items-start justify-between">
@@ -281,7 +281,7 @@ const handleCitySelect = (city: any) => {
 
           <div className="xl:flex items-center gap-2 hidden">
             <Phone className="w-4 h-4 text-orange-500" />
-            <span className="text-gray-700 font-medium">7447-0000-45</span>
+            <span className="text-gray-700 text-sm font-medium">7447-0000-45</span>
           </div>
 
           <div className="flex items-center gap-5">

@@ -2,7 +2,7 @@
 
 import { X, MapPin } from "lucide-react";
 import { useState } from "react";
-
+import Swal from "sweetalert2";
 interface RescheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,18 +16,37 @@ const RescheduleModal = ({ isOpen, onClose, onReschedule, onConfirm, currentBook
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedDate || !selectedTime) {
-      alert("Please select both date and time");
+      await Swal.fire({
+        icon: "warning",
+        title: "Missing Information",
+        text: "Please select both date and time.",
+        confirmButtonColor: "#FF6B00",
+      });
       return;
     }
-    
+
     if (onReschedule) {
       onReschedule(selectedDate, selectedTime, notes);
     } else if (onConfirm) {
-      onConfirm({ date: selectedDate, time: selectedTime, notes });
+      onConfirm({
+        date: selectedDate,
+        time: selectedTime,
+        notes,
+      });
     }
+
+    await Swal.fire({
+      icon: "success",
+      title: "Rescheduled Successfully!",
+      text: "Your service has been rescheduled.",
+      timer: 1800,
+      showConfirmButton: false,
+    });
+
     resetForm();
+    onClose();
   };
 
   const resetForm = () => {

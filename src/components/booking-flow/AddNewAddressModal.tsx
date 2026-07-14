@@ -3,7 +3,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
-
+import Swal from "sweetalert2";
 interface AddNewAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,20 +33,33 @@ export const AddNewAddressModal: React.FC<AddNewAddressModalProps> = ({
   if (!isOpen) return null;
 
   
- const handleSave = () => {
-   console.log("FORM DATA BEFORE SAVE:", formData);
-if (
-  formData.name &&
-  formData.phone &&
-  formData.houseNo &&
-  formData.city &&
-  formData.pincode
-) {
-  onSave(formData);
-} else {
-  alert("Please fill all required fields");
-}
- };
+const handleSave = async () => {
+  console.log("FORM DATA BEFORE SAVE:", formData);
+
+  if (
+    formData.name &&
+    formData.phone &&
+    formData.houseNo &&
+    formData.city &&
+    formData.pincode
+  ) {
+    onSave(formData);
+
+    await Swal.fire({
+      icon: "success",
+      title: "Address Saved!",
+      text: "Your address has been added successfully.",
+      timer: 1800,
+      showConfirmButton: false,
+    });
+  } else {
+    await Swal.fire({
+      icon: "warning",
+      title: "Required Fields Missing",
+      text: "Please fill all required fields.",
+    });
+  }
+};
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative max-h-96 overflow-y-auto">

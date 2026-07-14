@@ -2,7 +2,7 @@
 
 import { X, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
-
+import Swal from "sweetalert2";
 interface Address {
   id: string;
   name: string;
@@ -51,16 +51,31 @@ const AddressSelectionModal = ({
     }
   ];
 
-  const handleContinue = () => {
-    if (!selectedAddressId) {
-      alert("Please select an address");
-      return;
-    }
-    const selected = addresses.find(addr => addr.id === selectedAddressId);
-    if (selected) {
-      onContinue(selected);
-    }
-  };
+ const handleContinue = async () => {
+   if (!selectedAddressId) {
+     await Swal.fire({
+       icon: "warning",
+       title: "No Address Selected",
+       text: "Please select an address to continue.",
+       confirmButtonColor: "#f97316",
+     });
+     return;
+   }
+
+   const selected = addresses.find((addr) => addr.id === selectedAddressId);
+
+   if (selected) {
+     await Swal.fire({
+       icon: "success",
+       title: "Address Selected",
+       text: `${selected.name} address selected successfully.`,
+       timer: 1500,
+       showConfirmButton: false,
+     });
+
+     onContinue(selected);
+   }
+ }; 
 
   if (!isOpen) return null;
 

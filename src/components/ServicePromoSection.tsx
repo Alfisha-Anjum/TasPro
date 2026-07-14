@@ -24,7 +24,7 @@ export default function ServicePromoSection() {
     <section className="pt-5 ">
       <ResponsiveContainer>
         <div
-          className="relative overflow-hidden shadow-xl py-2 px-5 sm:p-5 sm:px-10 flex-row"
+          className="relative overflow-hidden shadow-xl py-2 px-5 sm:p-5 sm:px-10 flex-row z-0"
           style={{
             width: "100%",
             // height: "340px",

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import ProfileImageUploader from "@/components/ProfileImageUploader";
+import Swal from "sweetalert2";
 import { 
   Home, 
   Calendar, 
@@ -68,13 +69,23 @@ const MyProfilePage = () => {
     // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+     Swal.fire({
+       icon: "warning",
+       title: "Invalid Image",
+       text: "Please select a valid image file (JPEG, PNG, GIF, or WebP).",
+       confirmButtonColor: "#f97316",
+     });
       return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
+    Swal.fire({
+      icon: "warning",
+      title: "File Too Large",
+      text: "File size must be less than 5MB.",
+      confirmButtonColor: "#f97316",
+    });
       return;
     }
 
@@ -91,6 +102,7 @@ const MyProfilePage = () => {
     updateUserProfile({ profileImage: imageUrl });
   };
 
+  
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -408,9 +420,18 @@ const MyProfilePage = () => {
                     <div className="space-y-4">
                       {isEditing ? (
                         <button
-                          onClick={() => {
-                            // Save changes and exit edit mode
+                          onClick={async () => {
                             updateUserProfile(formData);
+
+                            await Swal.fire({
+                              icon: "success",
+                              title: "Profile Updated!",
+                              text: "Your changes have been saved successfully.",
+                              timer: 1800,
+                              showConfirmButton: false,
+                            });
+
+                            setIsEditing(false);
                             setIsEditing(false);
                           }}
                           className="w-full py-3 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
@@ -473,9 +494,12 @@ const MyProfilePage = () => {
                               setIsEditing(false);
                             } catch (error) {
                               console.error("Save profile error:", error);
-                              alert(
-                                "Failed to save profile. Please try again.",
-                              );
+                              Swal.fire({
+                                icon: "error",
+                                title: "Save Failed",
+                                text: "Failed to save profile. Please try again.",
+                                confirmButtonColor: "#f97316",
+                              });
                             }
                           }}
                           className="w-full py-3 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
@@ -560,17 +584,31 @@ const MyProfilePage = () => {
                                   passwordData.newPassword !==
                                   passwordData.confirmNewPassword
                                 ) {
-                                  alert("New passwords do not match");
+                                  Swal.fire({
+                                    icon: "warning",
+                                    title: "Password Mismatch",
+                                    text: "New passwords do not match.",
+                                    confirmButtonColor: "#f97316",
+                                  });
                                   return;
                                 }
                                 if (passwordData.newPassword.length < 6) {
-                                  alert(
-                                    "Password must be at least 6 characters",
-                                  );
+                                  Swal.fire({
+                                    icon: "warning",
+                                    title: "Weak Password",
+                                    text: "Password must be at least 6 characters.",
+                                    confirmButtonColor: "#f97316",
+                                  });
                                   return;
                                 }
                                 // In a real app, you would send the password change request to the backend
-                                alert("Password changed successfully!");
+                                Swal.fire({
+                                  icon: "success",
+                                  title: "Success!",
+                                  text: "Password changed successfully.",
+                                  timer: 1800,
+                                  showConfirmButton: false,
+                                });
                                 // Reset form and exit password change mode
                                 setPasswordData({
                                   currentPassword: "",
@@ -595,7 +633,22 @@ const MyProfilePage = () => {
                       )}
 
                       <button
-                        onClick={logout}
+                        onClick={async () => {
+                          const result = await Swal.fire({
+                            title: "Logout?",
+                            text: "Are you sure you want to logout?",
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonText: "Logout",
+                            cancelButtonText: "Cancel",
+                            confirmButtonColor: "#ef4444",
+                            cancelButtonColor: "#6b7280",
+                          });
+
+                          if (result.isConfirmed) {
+                            logout();
+                          }
+                        }}
                         className="w-full py-3 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 transition-colors"
                       >
                         Logout
