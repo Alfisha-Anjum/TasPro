@@ -422,6 +422,7 @@ const totalSavings = cartItems.reduce(
   0,
 );
 
+
   return (
     <>
       <section>
@@ -579,6 +580,7 @@ const totalSavings = cartItems.reduce(
               </div>
             )}
 
+
             <div className="relative w-full flex items-center mb-5">
               {activeScroll === "tabs" && canScroll && !atStart && (
                 <button
@@ -635,6 +637,7 @@ const totalSavings = cartItems.reduce(
                 </button>
               )}
             </div>
+
 
             <div className=" mt-14">
               <div

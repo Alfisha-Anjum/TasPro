@@ -45,45 +45,48 @@ const createBooking = async (paymentMethod: string) => {
     
   try {
     const token = localStorage.getItem("token");
-    const bookingDateTime = JSON.parse(
-      localStorage.getItem("bookingDateTime") || "{}",
-    );
-    const selectedAddress = JSON.parse(
-      localStorage.getItem("selectedAddress") || "{}",
-    );
+   const bookingDateTime = JSON.parse(
+     localStorage.getItem("bookingDateTime") || "{}",
+   );
 
-    const payload = {
-      date: bookingDateTime.date,
-      slot_id: Number(bookingDateTime.slotId || 1),
-      customer_notes: bookingDateTime.notes?.trim() || "Need urgent service",
-      address_id: String(selectedAddress?.id || 1),
-      payment_type: paymentMethod,
-      gst_no: "22AAAAA0000A1Z5",
-      pan_no: "ABCDE1234F",
-      service_category_id: Number(
-        cartItems[0]?.service_category_id ||
-          cartItems[0]?.serviceCategoryId ||
-          1,
-      ),
-      service_id: Number(
-        cartItems[0]?.service_id || cartItems[0]?.serviceId || 1,
-      ),
-      razorpay_payment_id: "",
-      state_name: "Chhattisgarh",
-      city_name: "Raipur",
-    };
+   const selectedAddress = JSON.parse(
+     localStorage.getItem("selectedAddress") || "{}",
+   );
 
-    const res = await axios.post(
-      "https://app.tasprocompany.in/api/customers/customer-bookings",
-      payload,
-      {
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+   const payload = {
+     date: bookingDateTime.date,
+     slot_id: Number(bookingDateTime.slotId || 1),
+     customer_notes: bookingDateTime.notes?.trim() || "Need urgent service",
+     address_id: String(selectedAddress?.id || 1),
+     payment_type: "ONLINE",
+     gst_name: "",
+     gst_no: "",
+     pan_name: "",
+     pan_no: "",
+     service_category_id: Number(
+       cartItems[0]?.service_category_id ||
+         cartItems[0]?.serviceCategoryId ||
+         1,
+     ),
+     service_id: Number(
+       cartItems[0]?.service_id || cartItems[0]?.serviceId || 1,
+     ),
+     razorpay_payment_id: "",
+     state_name: "Chhattisgarh",
+     city_name: "Raipur",
+   };
+
+   const res = await axios.post(
+     "https://app.tasprocompany.in/api/customers/customer-bookings",
+     payload,
+     {
+       headers: {
+         Accept: "*/*",
+         Authorization: `Bearer ${token}`,
+         "Content-Type": "application/json",
+       },
+     },
+   );
 
    if (res.data?.status) {
   clearCart();
@@ -105,6 +108,7 @@ const createBooking = async (paymentMethod: string) => {
 }
   } catch (error: any) {
     console.log("BOOKING API ERROR:", error?.response?.data || error);
+    console.log(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
     // alert("Booking failed");
     Swal.fire({
       icon: "error",
@@ -119,19 +123,48 @@ const createBooking = async (paymentMethod: string) => {
 
 const handleRazorpayPayment = async () => {
   try {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-    // 1. Create order
-    const res = await axios.post(
-      "https://app.tasprocompany.in/api/customers/customer-bookings",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+  const bookingDateTime = JSON.parse(
+    localStorage.getItem("bookingDateTime") || "{}",
+  );
+
+  const selectedAddress = JSON.parse(
+    localStorage.getItem("selectedAddress") || "{}",
+  );
+
+  const payload = {
+    date: bookingDateTime.date,
+    slot_id: Number(bookingDateTime.slotId || 1),
+    customer_notes: bookingDateTime.notes?.trim() || "Need urgent service",
+    address_id: String(selectedAddress?.id || 1),
+    payment_type: "ONLINE",
+    gst_name: "",
+    gst_no: "",
+    pan_name: "",
+    pan_no: "",
+    service_category_id: Number(
+      cartItems[0]?.service_category_id || cartItems[0]?.serviceCategoryId || 1,
+    ),
+    service_id: Number(
+      cartItems[0]?.service_id || cartItems[0]?.serviceId || 1,
+    ),
+    razorpay_payment_id: "",
+    state_name: "Chhattisgarh",
+    city_name: "Raipur",
+  };
+
+  const res = await axios.post(
+    "https://app.tasprocompany.in/api/customers/customer-bookings",
+    payload,
+    {
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-    );
-
+    },
+  );
     console.log(res.data);
 
     const order = res.data.data;

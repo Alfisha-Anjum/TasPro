@@ -60,8 +60,8 @@ const [formData, setFormData] = useState({
      !formData.postalCode ||
      !formData.state ||
      !formData.city ||
-     !formData.houseNo ||
-     !formData.location
+     !formData.houseNo
+   
    ) {
      await Swal.fire({
        icon: "warning",
@@ -93,95 +93,156 @@ const [formData, setFormData] = useState({
 
   if (!isOpen) return null;
 
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
+//   const handleUseCurrentLocation = () => {
+//     if (!navigator.geolocation) {
+//     Swal.fire({
+//       icon: "error",
+//       title: "Location Not Supported",
+//       text: "Your browser does not support geolocation.",
+//       confirmButtonColor: "#f97316",
+//     });
+//       return;
+//     }
+
+//     navigator.geolocation.getCurrentPosition(
+//       async (position) => {
+//         const latitude = position.coords.latitude;
+//         const longitude = position.coords.longitude;
+
+//         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY;
+// // console.log("API Key:", process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY);
+//         const res = await fetch(
+//           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
+//         );
+
+//       const data = await res.json();
+
+//       console.log("Geocoding Response:", data);
+
+//       if (data.status !== "OK") {
+//        Swal.fire({
+//          icon: "error",
+//          title: "Location Error",
+//          text: data.error_message || data.status,
+//          confirmButtonColor: "#f97316",
+//        });
+//         return;
+//       }
+//         const result = data?.results?.[0];
+
+//         let city = "";
+//         let state = "";
+//         let postalCode = "";
+
+//         result?.address_components?.forEach((component: any) => {
+//           if (component.types.includes("locality")) {
+//             city = component.long_name;
+//           }
+
+//           if (component.types.includes("administrative_area_level_1")) {
+//             state = component.long_name;
+//           }
+
+//           if (component.types.includes("postal_code")) {
+//             postalCode = component.long_name;
+//           }
+//         });
+
+//         setFormData((prev) => ({
+//           ...prev,
+//           latitude,
+//           longitude,
+//           location: result?.formatted_address || "",
+//           postalCode: postalCode || prev.postalCode,
+//           city,
+//           state,
+//           city_name: city,
+//           state_name: state,
+//         }));
+//         localStorage.setItem(
+//           "user_location",
+//           JSON.stringify({
+//             latitude,
+//             longitude,
+//             address: result?.formatted_address || "",
+//             city,
+//             state,
+//           }),
+//         );
+
+//         window.dispatchEvent(new Event("location-updated"));
+//       },
+//       () => {
+//        Swal.fire({
+//          icon: "warning",
+//          title: "Permission Required",
+//          text: "Please allow location permission to fetch your current address.",
+//          confirmButtonColor: "#f97316",
+//        });
+//       },
+//     );
+//   };
+
+
+const handleUseCurrentLocation = () => {
+  if (!navigator.geolocation) {
     Swal.fire({
       icon: "error",
       title: "Location Not Supported",
       text: "Your browser does not support geolocation.",
-      confirmButtonColor: "#f97316",
     });
-      return;
-    }
+    return;
+  }
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+  navigator.geolocation.getCurrentPosition(
+    async ({ coords }) => {
+      const { latitude, longitude } = coords;
 
-        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY;
-// console.log("API Key:", process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY);
+      try {
         const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
         );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      console.log("Geocoding Response:", data);
+        const city =
+          data.address.city ||
+          data.address.town ||
+          data.address.village ||
+          "";
 
-      if (data.status !== "OK") {
-       Swal.fire({
-         icon: "error",
-         title: "Location Error",
-         text: data.error_message || data.status,
-         confirmButtonColor: "#f97316",
-       });
-        return;
-      }
-        const result = data?.results?.[0];
+        const state = data.address.state || "";
 
-        let city = "";
-        let state = "";
-        let postalCode = "";
-
-        result?.address_components?.forEach((component: any) => {
-          if (component.types.includes("locality")) {
-            city = component.long_name;
-          }
-
-          if (component.types.includes("administrative_area_level_1")) {
-            state = component.long_name;
-          }
-
-          if (component.types.includes("postal_code")) {
-            postalCode = component.long_name;
-          }
-        });
+        const postalCode = data.address.postcode || "";
 
         setFormData((prev) => ({
           ...prev,
           latitude,
           longitude,
-          location: result?.formatted_address || "",
-          postalCode: postalCode || prev.postalCode,
+          location: data.display_name,
           city,
           state,
+          postalCode,
           city_name: city,
           state_name: state,
         }));
-        localStorage.setItem(
-          "user_location",
-          JSON.stringify({
-            latitude,
-            longitude,
-            address: result?.formatted_address || "",
-            city,
-            state,
-          }),
-        );
-
-        window.dispatchEvent(new Event("location-updated"));
-      },
-      () => {
-       Swal.fire({
-         icon: "warning",
-         title: "Permission Required",
-         text: "Please allow location permission to fetch your current address.",
-         confirmButtonColor: "#f97316",
-       });
-      },
-    );
-  };
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Location Error",
+          text: "Unable to fetch your address.",
+        });
+      }
+    },
+    () => {
+      Swal.fire({
+        icon: "warning",
+        title: "Permission Required",
+        text: "Please allow location access.",
+      });
+    }
+  );
+};
 
  const states = ["Chhattisgarh", "Madhya Pradesh", "Maharashtra", "Delhi"];
 
@@ -262,7 +323,7 @@ const [formData, setFormData] = useState({
               {/* Postal Code */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-1">
-                  Postal Code *
+                  Postal Code <span className="text-[#FF6B00]">*</span>
                 </label>
                 <input
                   type="text"
@@ -305,7 +366,7 @@ const [formData, setFormData] = useState({
               {/* State */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-1">
-                  State *
+                  State <span className="text-[#FF6B00]">*</span>
                 </label>
                 <select
                   name="state"
@@ -325,7 +386,7 @@ const [formData, setFormData] = useState({
               {/* City */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-1">
-                  City *
+                  City <span className="text-[#FF6B00]">*</span>
                 </label>
                 <input
                   type="text"
