@@ -13,36 +13,36 @@ import axios from "axios";
 import Image from "next/image";
 import Swal from "sweetalert2";
 
-const frequentlyAdded = [
-  {
-    id: 1,
-    title: "AC Repair (Split)",
-    price: 299,
-    originalPrice: 499,
-    image: "/ac.png",
-  },
-  {
-    id: 2,
-    title: "Drain Clean AC",
-    price: 499,
-    originalPrice: 799,
-    image: "/ac.png",
-  },
-  {
-    id: 3,
-    title: "AC Gas Refill",
-    price: 1499,
-    originalPrice: 1999,
-    image: "/ac.png",
-  },
-  {
-    id: 4,
-    title: "AC Installation",
-    price: 999,
-    originalPrice: 1299,
-    image: "/ac.png",
-  },
-];
+// const frequentlyAdded = [
+//   {
+//     id: 1,
+//     title: "AC Repair (Split)",
+//     price: 299,
+//     originalPrice: 499,
+//     image: "/ac.png",
+//   },
+//   {
+//     id: 2,
+//     title: "Drain Clean AC",
+//     price: 499,
+//     originalPrice: 799,
+//     image: "/ac.png",
+//   },
+//   {
+//     id: 3,
+//     title: "AC Gas Refill",
+//     price: 1499,
+//     originalPrice: 1999,
+//     image: "/ac.png",
+//   },
+//   {
+//     id: 4,
+//     title: "AC Installation",
+//     price: 999,
+//     originalPrice: 1299,
+//     image: "/ac.png",
+//   },
+// ];
 
 export default function CartPage() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function CartPage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [editingAddress, setEditingAddress] = useState<any | null>(null);
   const [isBookingFlow, setIsBookingFlow] = useState(false);
-
+const [frequentlyAdded, setFrequentlyAdded] = useState<any[]>([]);
   const displayAddress = selectedAddress || addresses[0];
 
   const totalMRP = cartItems.reduce(
@@ -244,7 +244,10 @@ const createCustomerCart = async () => {
     );
 
     console.log("Cart Created:", res.data);
-
+// console.log("Cart Created:", res.data);
+setFrequentlyAdded(res.data?.data?.frequently_added || []);
+// Open Slot Selection Modal
+setShowDateTimeModal(true);
     // Continue your success flow here
     // Example:
     // router.push("/booking-payment");
@@ -734,54 +737,57 @@ const handleDateTimeContinue = (
               </div>
             </div>
           </div>
-        </main>
+          {frequentlyAdded.length > 0 && (
+            <div className="p-5 px-0 lg:px-8">
+              <h3 className="font-semibold mb-2">Frequently Added Together</h3>
 
-        {/* <DeepCleaningServices title="Frequently Added Together" /> */}
-
-        <div className="p-5 px-0 lg:px-8">
-          <h3 className="font-semibold mb-2">Frequently Added Together</h3>
-
-          <div
-            className=" overflow-auto flex gap-3"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            {frequentlyAdded.map((item) => (
               <div
-                key={item.id}
-                className="
-      min-w-[110px] md:min-w-[70%] 
-      border rounded-xl bg-white
-      shadow-sm
-    "
+                className=" overflow-auto gap-3 grid grid-cols-3 sm:grid-cols-4"
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
               >
-                {/* Image */}
-                <div className="relative w-full h-20 md:h-40 rounded-t-xl overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-2 md:p-4">
-                  <p className="text-[10px] md:text-base font-medium line-clamp-2">
-                    {item.title || "Service Name"}
-                  </p>
-
-                  <div className="mt-1 md:mt-3">
-                    <span className="font-semibold text-gray-900 text-xs md:text-lg">
-                      ₹{item.price}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => handleAddItem(item)}
+                {frequentlyAdded.map((item) => (
+                  <div
+                    key={item.id}
                     className="
+  
+      border rounded-xl bg-white
+      shadow-sm 
+    "
+                  >
+                    {/* Image */}
+                    <div className="relative w-full h-20 md:h-40 rounded-t-xl overflow-hidden">
+                      <Image
+                        src={item.image || "/placeholder.png"}
+                        alt={item.title}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-2 md:p-4">
+                      <p className="text-[10px] md:text-base font-medium line-clamp-2">
+                        {item.title || "Service Name"}
+                      </p>
+                     
+                      <div className="mt-1 md:mt-3">
+                        <span className="font-semibold text-gray-900 text-xs md:text-lg">
+                          ₹{item.price}
+                        </span>
+                        {item.original_price && (
+                          <span className="text-gray-400 line-through text-xs md:text-sm">
+                            ₹{item.original_price}
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => handleAddItem(item)}
+                        className="
           mt-2 md:mt-4
           w-full
           border border-orange-500
@@ -792,14 +798,19 @@ const handleDateTimeContinue = (
           rounded-lg
           hover:bg-orange-50
         "
-                  >
-                    Add
-                  </button>
-                </div>
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          )}
+        </main>
+
+        {/* <DeepCleaningServices title="Frequently Added Together" /> */}
+
         <SelectAddressModal
           isOpen={showAddressModal}
           onClose={() => setShowAddressModal(false)}
