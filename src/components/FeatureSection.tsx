@@ -46,7 +46,7 @@ export default function FeatureSection() {
               </div>
 
               {/* Feature Title */}
-              <h3 className="mt-[12px] text-base sm:text-xs lg:text-[18px] font-semibold text-[#1A1A1A] dark:text-gray-300 leading-tight">
+              <h3 className="mt-[12px] text-base sm:text-xs lg:text-[14px] font-semibold text-[#1A1A1A] dark:text-gray-300 leading-tight">
                 {feature.title}
               </h3>
             </div>
