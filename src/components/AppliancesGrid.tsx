@@ -198,9 +198,9 @@ const AppliancesGrid = ({ data = [] }: { data?: any[] }) => {
                   <SafeImage
                     src={appliance.image}
                     alt={appliance.label}
-                    width={56}
-                    height={56}
-                    className="h-14 object-contain"
+                    width={100}
+                    height={100}
+                    className="h-28 object-contain"
                   />
                 </div>
                 <span className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-tight">
